@@ -1,0 +1,2351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Blood Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f7f9fb; }
+        .content-area::-webkit-scrollbar { width: 8px; }
+        .content-area::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; }
+
+        /* NEW: Header Logo Styles */
+        .header-logo {
+            height: 48px; /* h-12 */
+            width: 48px;  /* w-12 */
+            object-fit: contain; /* Prevents stretching */
+            border-radius: 9999px; /* rounded-full */
+        }
+
+        /* --- STYLES FOR TAB 1 & TAB 2 (Registrations) --- */
+        .unit-table-container, .registration-table-container { max-height: 250px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; background: #fdfdfe; box-shadow: inset 0 2px 4px 0 rgba(0,0,0,0.03); margin-bottom: 1rem; }
+        .unit-table, .registration-table { width: 100%; border-collapse: collapse; }
+        /* UPDATED: font-size reduced from 0.9rem to 0.825rem */
+        .unit-table th, .unit-table td, .registration-table th, .registration-table td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #e2e8f0; font-size: 0.825rem; }
+        .unit-table th, .registration-table th { background-color: #f8fafc; color: #475569; font-weight: 600; position: sticky; top: 0; }
+        .unit-table td, .registration-table td { color: #334155; }
+        /* UPDATED: font-size reduced from 0.85rem to 0.75rem (text-xs) */
+        .unit-table .action-btn, .registration-table .action-btn { font-size: 0.75rem; font-weight: 600; padding: 4px 10px; border-radius: 5px; cursor: pointer; transition: all 0.2s; margin-right: 5px; }
+        .btn-select-unit { background-color: #22c55e; color: white; border: none; }
+        .btn-select-unit:hover { background-color: #16a34a; }
+        .btn-remove-unit { background-color: #ef4444; color: white; border: none; }
+        .btn-remove-unit:hover { background-color: #dc2626; }
+        .btn-prepare-report { background-color: #3b82f6; color: white; border: none; }
+        .btn-prepare-report:hover { background-color: #2563eb; }
+        .btn-delete-registration { background-color: #6b7280; color: white; border: none; }
+        .btn-delete-registration:hover { background-color: #4b5563; }
+        .status-allotted { color: #ca8a04; font-weight: 600; font-style: italic; }
+        .status-available { color: #16a34a; font-weight: 600; }
+        .status-crossmatch_ok { color: #16a34a; font-weight: 600; }
+
+        /* NEW: Styles for patient suggestion list */
+        #patientSuggestionList {
+            border: 1px solid #e2e8f0;
+            border-top: none;
+            border-radius: 0 0 6px 6px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+        .suggestion-item {
+            padding: 8px 12px;
+            cursor: pointer;
+            background-color: #fff;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .suggestion-item:hover {
+            background-color: #f1f5f9;
+        }
+        .suggestion-item:last-child {
+            border-bottom: none;
+            border-radius: 0 0 6px 6px;
+        }
+        .suggestion-item .name { font-weight: 600; color: #0c4a6e; }
+        /* UPDATED: font-size reduced from 0.85rem to 0.75rem (text-xs) */
+        .suggestion-item .details { font-size: 0.75rem; color: #475569; }
+
+
+        /* --- UPDATED STYLES FOR COMPATIBILITY REPORT (TAB 2 Printable Section) --- */
+        /* These styles are for the print layout and are NOT reduced */
+        @page { 
+            size: A4 portrait; 
+            margin: 0.5cm; 
+        }
+        .report-section * { 
+            box-sizing: border-box; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            line-height: 1.3;
+        }
+        #content-2 .report-outer-container { 
+            width: 100%; 
+            max-width: 21cm; 
+            margin: 0 auto; 
+        }
+        .report-section { 
+            display: none; 
+            width: 21cm;
+            min-height: 29.7cm; 
+            padding: 1cm;
+            color: #333; 
+            background: white; 
+            position: relative; 
+            margin-top: 1rem; 
+        }
+        .header-report {
+            margin-bottom: 0.4cm;
+            padding-bottom: 0.25cm;
+            border-bottom: 2px solid #e53935;
+        }
+        .logo-bar {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
+        .logo-left, .logo-right {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .logo-left img {
+    width: auto;
+    height: auto;
+    max-width: 65px;
+    max-height: 65px;
+}
+.logo-right img {
+    width: auto;
+    height: auto;
+    max-width: 90px;  /* Increased from 65px */
+    max-height: 90px; /* Increased from 65px */
+}
+        .heading-center {
+            flex: 2;
+            text-align: center;
+        }
+        .heading-center h2 {
+            font-size: 13pt;
+            margin: 0;
+            font-weight: bold;
+        }
+        .heading-center p {
+            margin: 0.1cm 0;
+            font-weight: normal;
+            font-size: 10pt;
+        }
+        .report-title-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0.25cm 0;
+        }
+        .document-date {
+            font-weight: bold;
+            font-size: 9pt;
+            margin-bottom: 0.4cm;
+            text-align: right;
+            width: 100%;
+        }
+        .report-title {
+            color: #c62828;
+            font-size: 12pt;
+            text-align: center;
+            margin-bottom: 0.4cm;
+            font-weight: normal;
+        }
+        .patient-info-flex {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+            width: 100%;
+            margin-bottom: 0.4cm;
+            position: relative;
+        }
+        .patient-info-left {
+            flex: 2 1 0;
+            margin-right: 2cm;
+        }
+        .patient-info-qr {
+            flex: 0 0 100px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: flex-end;
+            min-width: 100px;
+            position: absolute;
+            right: 0;
+            top: 0;
+        }
+        #qrCodeContainer {
+            width: 85px;
+            height: 85px;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #ccc;
+        }
+        #qrCodeContainer img,
+        #qrCodeContainer canvas {
+            width: 100% !important;
+            height: 100% !important;
+            max-width: 100%;
+            max-height: 100%;
+        }
+        .patient-info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 0.4cm;
+            font-size: 9pt;
+        }
+        .patient-info-table td {
+            padding: 0.18cm;
+            vertical-align: top;
+            font-weight: normal;
+        }
+        .patient-info-table td:first-child {
+            width: 25%;
+        }
+        .patient-info-table td:nth-child(even) {
+            font-weight: 700;
+        }
+        .report-table-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 0.4cm;
+        }
+        .report-table {
+            border-collapse: collapse;
+            font-size: 8.5pt; /* Reduced font size for table */
+            table-layout: fixed;
+            width: 100%;
+            max-width: 100%;
+        }
+        .report-table, .report-table th, .report-table td {
+            border: 1px solid #ddd;
+        }
+        .report-table th, .report-table td {
+            padding: 0.15cm; /* Reduced padding */
+            text-align: center;
+            font-weight: normal; /* Changed from bold to normal */
+        }
+        /* Updated column widths */
+        .report-table th:nth-child(1), .report-table td:nth-child(1) { width: 4%; }   /* Sr No */
+        .report-table th:nth-child(2), .report-table td:nth-child(2) { width: 9%; }   /* Cross Match No */
+        .report-table th:nth-child(3), .report-table td:nth-child(3) { width: 10%; }  /* Bag No */
+        .report-table th:nth-child(4), .report-table td:nth-child(4) { width: 12%; }  /* Blood Group & Rh */
+        .report-table th:nth-child(5), .report-table td:nth-child(5) { width: 7%; }   /* Vol. in ml */
+        .report-table th:nth-child(6), .report-table td:nth-child(6) { width: 11%; }  /* Date of Collection */
+        .report-table th:nth-child(7), .report-table td:nth-child(7) { width: 11%; }  /* Date of Expiry */
+        .report-table th:nth-child(8), .report-table td:nth-child(8) { width: 10%; }  /* Compatibility */
+        .report-table th:nth-child(9), .report-table td:nth-child(9) { width: 14%; }  /* Date & Time Of Issue - Reduced */
+        .report-table th:nth-child(10), .report-table td:nth-child(10) { width: 12%; } /* Issued By */
+        .report-footer {
+            margin-top: 0.4cm;
+            font-size: 8.5pt; /* Reduced font size for footer */
+        }
+        .signature-line {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1.3cm;
+            padding-top: 0.3cm;
+            border-top: 1px solid #ddd;
+        }
+        .signature-left {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .signature-right {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .signature-technician-block {
+            display: inline-block;
+            text-align: center;
+            width: max-content;
+        }
+        .signature-name {
+            font-weight: 700;
+            margin-bottom: 0.05cm;
+            width: 100%;
+            font-size: 8.5pt; /* Reduced font size for signatures */
+        }
+        .cls-signature-title {
+            font-size: 7.5pt; /* Reduced font size */
+            color: #555;
+            font-weight: normal;
+            text-align: center;
+            width: 100%;
+            margin-left: 1.4cm;
+        }
+        .signature-title {
+            font-size: 7.5pt; /* Reduced font size */
+            color: #555;
+            font-weight: normal;
+            text-align: center;
+            width: 100%;
+            margin-left: 0;
+        }
+        .instructions {
+            margin-top: 0.4cm;
+            padding: 0.25cm;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            border-left: 4px solid #c62828;
+            font-size: 7.5pt;
+        }
+        .instructions h4 {
+            color: #c62828;
+            margin-bottom: 0.15cm;
+            font-size: 8pt;
+            font-weight: normal;
+        }
+        .instructions ol {
+            padding-left: 1cm;
+            column-count: 2;
+            column-gap: 0.5cm;
+        }
+        .instructions li {
+            margin-bottom: 0.15cm;
+            line-height: 1.2;
+            break-inside: avoid;
+            font-weight: normal;
+        }
+
+        /* --- STYLES FOR BLOOD STOCK (TAB 3) --- */
+        /* --- Styles copied from index.html --- */
+        .stock-container {margin: 0 auto; color:#333; font-size:14px; text-align:center;}
+        .summary-container { margin: 0 auto 15px auto; max-width: 950px; border: 1px solid #bee3f8; padding: 15px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; background-color: #ebf8ff; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(49, 130, 206, 0.1), 0 2px 4px -1px rgba(49, 130, 206, 0.06); }
+        .summary-item { text-align: center; font-size: 0.9em; font-weight: bold; padding: 4px 10px; min-width: 55px; background-color: #fff; border-radius: 5px; border: 1px solid #bee3f8; }
+        #adminView { display: block; } #publicView { display: none; }
+        .view-info { padding: 10px; background-color: #fff8e1; border: 1px solid #ffecb3; border-radius: 5px; margin: 0 auto 15px auto; max-width: 600px; }
+        #addBagForm {margin:0 auto 20px auto; display: flex; gap:10px; padding:15px; border:1px solid #e2e8f0; border-radius:8px; background-color:#fff; align-items:flex-end; flex-wrap:wrap; justify-content:center; box-shadow: 0 2px 4px rgba(0,0,0,0.05);}
+        #addBagForm div{ display:flex; flex-direction:column; text-align:left;}
+        #addBagForm label{font-weight:bold; margin-bottom:4px;font-size:0.9em;}
+        #addBagForm input, #addBagForm select, #addBagForm button {padding:8px;font-size:1em; border-radius: 4px; border: 1px solid #ccc;}
+        #addBagForm button{background-color:#38a169;color:white;border:none;cursor:pointer;font-weight:bold; transition: background-color 0.3s;}
+        #addBagForm button:hover { background-color: #2f855a; }
+        #printButton {background-color:#4299e1; color:white; border:none; padding:10px 20px; border-radius:4px; cursor:pointer; font-weight:bold; margin-bottom:15px; transition: background-color 0.3s;}
+        #printButton:hover { background-color: #3182ce; }
+        
+        /* Table Styles from index.html */
+        .matrix-thick-right { border-right: 3.1px double #1a365d !important; }
+        .matrix-thick-left { border-left: 3.1px double #1a365d !important; }
+        .group-header { background:#2c5282; color:#fff; letter-spacing:2px; border-bottom:2px solid #1a365d; font-size:1em; }
+        .sub-header { background:#bee3f8; font-weight:bold; }
+        .matrixTable { width:100%; border-collapse:collapse; margin-bottom:18px; background-color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05);}
+        .matrixTable th, .matrixTable td { border:1.2px solid #333; padding:3px 8px;text-align:center;}
+        .remove-btn-matrix { background:#e53e3e; color:#fff; border:none; border-radius:4px; cursor:pointer; font-size:0.89em; padding:2px 9px; margin-left:5px; }
+
+        #ledgerTable{ display:none;} #printDateStock{ display:block; font-size:1em; font-weight:bold; color:#2c5282; margin-bottom:8px; text-align:center;}
+        /* --- End of styles from index.html --- */
+
+
+        /* --- ARCHIVE STYLES --- */
+        .archive-table-container { max-height: 400px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; background: #fdfdfe; margin-bottom: 1rem; }
+        .archive-table { width: 100%; border-collapse: collapse; }
+        .archive-table th, .archive-table td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #e2e8f0; font-size: 0.85rem; }
+        .archive-table th { background-color: #f8fafc; color: #475569; font-weight: 600; position: sticky; top: 0; }
+        .archive-table td { color: #334155; }
+        .btn-archive-print { background-color: #3b82f6; color: white; border: none; padding: 4px 10px; border-radius: 5px; cursor: pointer; font-size: 0.8rem; margin-right: 5px; }
+        .btn-archive-print:hover { background-color: #2563eb; }
+        .btn-archive-delete { background-color: #ef4444; color: white; border: none; padding: 4px 10px; border-radius: 5px; cursor: pointer; font-size: 0.8rem; }
+        .btn-archive-delete:hover { background-color: #dc2626; }
+
+        /* --- RESERVATIONS STYLES --- */
+        .reservation-table-container { max-height: 360px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; background: #fdfdfe; margin-bottom: 1rem; }
+        .reservation-table { width: 100%; border-collapse: collapse; }
+        .reservation-table th, .reservation-table td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #e2e8f0; font-size: 0.95rem; }
+        .reservation-table th { background-color: #f8fafc; color: #475569; font-weight: 700; position: sticky; top: 0; }
+        .btn-res-edit { background:#f59e0b; color:#fff; border:none; padding:6px 10px; border-radius:6px; cursor:pointer; margin-right:6px; }
+        .btn-res-delete { background:#ef4444; color:#fff; border:none; padding:6px 10px; border-radius:6px; cursor:pointer; }
+        .reservation-status-reserved { color:#0b73d9; font-weight:700; } .reservation-status-cancelled { color:#ef4444; font-weight:700; }
+
+        /* NEW: Styles for Reservation Tab Bag List */
+        .reservation-table td.bag-list-cell {
+            vertical-align: top;
+            padding: 6px 10px;
+        }
+        .bag-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 6px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.9rem;
+        }
+        .bag-item:last-child {
+            border-bottom: none;
+        }
+        .bag-item span {
+            font-weight: 500;
+        }
+        .btn-issue-bag {
+            background-color: #22c55e;
+            color: white;
+            border: none;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .btn-issue-bag:hover {
+            background-color: #16a34a;
+        }
+
+
+        /* --- UPDATED PRINT STYLES --- */
+        @media print {
+            body > * { display: none !important; }
+            #reportSection, #reportSection * { 
+                display: block !important; 
+                box-shadow: none !important;
+                margin: 0 !important;
+            }
+            #reportSection { 
+                position: static !important; 
+                width: auto !important; 
+                margin: 0 !important; 
+                padding: 1cm !important; 
+                border: none !important; 
+                background: #fff !important; 
+                min-height: auto !important;
+                page-break-after: always;
+            }
+            .report-section {
+                display: block !important;
+                width: 21cm !important;
+                min-height: 29.7cm !important;
+            }
+            
+            /* Hide remove button when printing tab 3 (if user prints from browser) */
+            .remove-btn-matrix { display:none!important;}
+        }
+
+        /* Modal styles for reservation edit */
+        .modal-backdrop { background: rgba(0,0,0,0.5); position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 60; }
+        .modal-card { background: #fff; padding: 20px; border-radius: 8px; width: 100%; max-width: 560px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+        
+        /* Technician selector styles */
+        .technician-selector {
+            margin-top: 0.6cm;
+            padding: 0.4cm;
+            background: #f0f8ff;
+            border-radius: 6px;
+            border: 1px solid #b8daff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        /* UPDATED: font-size reduced from 10pt to 9pt */
+        .technician-selector label {
+            font-weight: 700;
+            color: #004085;
+            font-size: 9pt;
+        }
+        /* UPDATED: font-size reduced from 10pt to 9pt */
+        .technician-selector select {
+            padding: 0.2cm 0.4cm;
+            border: 1px solid #99c2ff;
+            border-radius: 4px;
+            font-weight: 600;
+            color: #004085;
+            font-size: 9pt;
+            width: 60%;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <div id="custom-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center justify-center" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full">
+            <h3 id="modal-title" class="text-lg font-semibold text-sky-700 mb-4">System Message</h3>
+            <p id="modal-message" class="text-gray-700 mb-6"></p>
+            <button type="button" onclick="document.getElementById('custom-modal').classList.add('hidden')" class="w-full bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 rounded-lg">OK</button>
+        </div>
+    </div>
+
+    <div id="reservation-modal" class="hidden modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="reservation-modal-title">
+        <div class="modal-card">
+            <h3 id="reservation-modal-title" class="text-lg font-semibold text-sky-700 mb-4">Edit Reservation</h3>
+            <form id="reservationEditForm" onsubmit="return false;">
+                <input type="hidden" id="reservation_edit_id" />
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Patient Name</label>
+                        <input id="reservation_edit_name" readonly class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border bg-gray-50"/>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">CR Number</label>
+                        <input id="reservation_edit_cr" readonly class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border bg-gray-50"/>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Blood Group</label>
+                        <input id="reservation_edit_group" readonly class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border bg-gray-50"/>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Bag Numbers</label>
+                        <input id="reservation_edit_bags" readonly class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border bg-gray-50"/>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Reservation Till Date</label>
+                        <input id="reservation_edit_till" type="date" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"/>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Status</label>
+                        <select id="reservation_edit_status" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                            <option value="reserved">Reserved</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="mt-4 flex justify-end gap-2">
+                    <button type="button" onclick="closeReservationModal()" class="px-4 py-2 rounded-md border bg-gray-100">Cancel</button>
+                    <button type="button" onclick="saveReservationEdit()" class="px-4 py-2 rounded-md bg-sky-600 text-white">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <header class="bg-sky-700 shadow-lg p-4 sticky top-0 z-10 header">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center">
+                <img src="BSC.png" alt="BSC Logo" class="header-logo">
+                <h1 class="text-3xl font-extrabold text-white tracking-tight ml-4"><span class="font-light text-sky-200">Dr. BAM Hospital </span>Blood Storage Centre</h1>
+            </div>
+            
+            <div class="flex items-center">
+                <div class="text-white text-sm font-light mr-4">Secure & Integrated Management System</div>
+                <img src="IR.png" alt="IR Logo" class="header-logo">
+            </div>
+        </div>
+    </header>
+
+    <div class="flex flex-col flex-1 container mx-auto px-4 py-8">
+        <div class="bg-white p-2 rounded-xl shadow-lg mb-8">
+            <div class="flex space-x-2 md:space-x-4 justify-center" role="tablist">
+                 <button type="button" id="tab-1" onclick="switchTab(1)" class="tab-btn active w-full md:w-auto px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none" role="tab" aria-controls="content-1" aria-selected="true">1. Registration & Allotment</button>
+                 <button type="button" id="tab-2" onclick="switchTab(2)" class="tab-btn w-full md:w-auto px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none" role="tab" aria-controls="content-2" aria-selected="false">2. Compatibility Report</button>
+                 <button type="button" id="tab-3" onclick="switchTab(3)" class="tab-btn w-full md:w-auto px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none" role="tab" aria-controls="content-3" aria-selected="false">3. Stock Inventory</button>
+                 <button type="button" id="tab-4" onclick="switchTab(4)" class="tab-btn w-full md:w-auto px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none" role="tab" aria-controls="content-4" aria-selected="false">4. Archive</button>
+                 <button type="button" id="tab-5" onclick="switchTab(5)" class="tab-btn w-full md:w-auto px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none" role="tab" aria-controls="content-5" aria-selected="false">5. Reservations</button>
+            </div>
+        </div>
+
+        <main class="flex-1 bg-white p-6 md:p-10 rounded-xl shadow-2xl border border-gray-100 content-area overflow-y-auto">
+            <div id="content-1" class="tab-content">
+                <h2 class="text-xl font-semibold text-gray-800 mb-6 border-b pb-2">Patient Registration & Unit Allotment</h2>
+                
+                <div class="mb-6 bg-sky-50 p-4 rounded-lg shadow-inner">
+                    <label for="patientSearch_reg" class="block text-xs font-medium text-gray-700 mb-1">Find Existing Patient:</label>
+                    <input type="search" id="patientSearch_reg" placeholder="Start typing Name or CR Number..." class="block w-full md:w-1/2 rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 p-2 border">
+                    <div id="patientSuggestionList" class="mt-2 max-h-40 overflow-y-auto"></div>
+                </div>
+
+                <div class="md:col-span-2">
+                    <h3 class="text-lg font-medium text-sky-600 mb-4">Patient Information</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div><label for="patientName_reg" class="block text-xs font-medium text-gray-700">Full Name</label><input type="text" id="patientName_reg" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 p-2 border"></div>
+                        <div><label for="patientAge_reg" class="block text-xs font-medium text-gray-700">Age</label><input type="text" id="patientAge_reg" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 p-2 border"></div>
+                        <div><label for="patientGender_reg" class="block text-xs font-medium text-gray-700">Gender</label><select id="patientGender_reg" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 p-2 border"><option value="">Select Gender</option><option value="MALE">MALE</option><option value="FEMALE">FEMALE</option><option value="OTHER">OTHER</option></select></div>
+                        <div><label for="patientCR_reg" class="block text-xs font-medium text-gray-700">CR Number / Patient ID</label><input type="text" id="patientCR_reg" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 p-2 border"></div>
+                        <div><label for="patientBG_reg" class="block text-xs font-medium text-gray-700">Blood Group & Rh</label><select id="patientBG_reg" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 p-2 border font-bold"><option value="">Select Blood Group</option><option value="A+">A POSITIVE</option><option value="A-">A NEGATIVE</option><option value="B+">B POSITIVE</option><option value="B-">B NEGATIVE</option><option value="AB+">AB POSITIVE</option><option value="AB-">AB NEGATIVE</option><option value="O+">O POSITIVE</option><option value="O-">O NEGATIVE</option></select></div>
+                        <div><label for="patientWard_reg" class="block text-xs font-medium text-gray-700">Ward</label><input type="text" id="patientWard_reg" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 p-2 border"></div>
+                        <div><label for="reservationDate_reg" class="block text-xs font-medium text-gray-700">Reservation Date (Optional)</label><input type="date" id="reservationDate_reg" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 p-2 border"></div>
+                    </div>
+                </div>
+                <div class="md:col-span-2 mt-8">
+                    <h3 class="text-lg font-medium text-sky-600 mb-4">Unit Allotment Selection</h3>
+                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="md:col-span-2 space-y-4">
+                            <div><label for="crossMatchStart_reg" class="block text-xs font-medium text-gray-700">Starting Cross-Match No.</label><input type="text" id="crossMatchStart_reg" placeholder="e.g., 501" class="mt-1 block w-full md:w-48 rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 p-2 border font-bold"></div>
+                            <div><h4 class="text-base font-medium text-gray-700 mb-2">Available Compatible Units</h4><div class="unit-table-container"><table class="unit-table" id="availableUnitsTable"><thead><tr><th>Bag Number</th><th>Group</th><th>Expiry Date</th><th>Status</th><th>Action</th></tr></thead><tbody><tr><td colspan="5" class="text-center text-gray-500 py-6">Select patient blood group.</td></tr></tbody></table></div></div>
+                        </div>
+                        <div class="space-y-4">
+                            <h4 class="text-base font-medium text-gray-700 mb-2">Selected Units for Allotment</h4><div class="unit-table-container bg-green-50/50"><table class="unit-table" id="selectedUnitsTable"><thead><tr><th>Cross-Match #</th><th>Bag Number</th><th>Action</th></tr></thead><tbody><tr><td colspan="3" class="text-center text-gray-500 py-6">No units selected.</td></tr></tbody></table></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="md:col-span-2 pt-6 border-t mt-8">
+                    <button type="button" id="registerAndAllotBtn" class="w-full md:w-80 bg-sky-500 hover:bg-sky-600 text-white font-bold py-2.5 px-4 rounded-lg shadow-md transition duration-150 ease-in-out">Register & Allot Units</button>
+                </div>
+            </div>
+
+            <div id="content-2" class="tab-content hidden">
+                 <h2 class="text-xl font-semibold text-gray-800 mb-6 border-b pb-2">Pending Registrations & Report Generation</h2>
+                 <div id="pendingRegistrationsSection" class="mb-8">
+                     <div class="mb-4">
+                         <label for="registrationSearch" class="block text-xs font-medium text-gray-700 mb-1">Search Pending Registrations:</label>
+                         <input type="search" id="registrationSearch" placeholder="Search by Name or CR Number..." class="block w-full md:w-1/2 rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 p-2 border">
+                     </div>
+                     <h3 class="text-base font-medium text-gray-700 mb-3">Select Registration to Prepare Report:</h3>
+                     <div class="registration-table-container">
+                        <table class="registration-table" id="pendingRegistrationsTable">
+                            <thead><tr><th>CR Number</th><th>Patient Name</th><th>Blood Group</th><th>Units Allotted</th><th>Status</th><th>Actions</th></tr></thead>
+                            <tbody><tr><td colspan="6" class="text-center text-gray-500 py-6">No pending registrations found.</td></tr></tbody>
+                        </table>
+                    </div>
+                 </div>
+                 <hr class="my-8 border-gray-300">
+                 
+                 <div class="technician-selector">
+                    <label for="technicianSelect">Cross Match Done By:</label>
+                    <select id="technicianSelect">
+                        <option value="SAJITH B.S.">SAJITH B.S. (CLS)</option>
+                        <option value="SATHEESH MANI">SATHEESH MANI (CLS)</option>
+                        <option value="JOHN DOE">JOHN DOE (LS)</option>
+                        <option value="JANE SMITH">JANE SMITH (LS)</option>
+                    </select>
+                 </div>
+                 
+                 <div class="report-outer-container">
+                    <div class="report-section" id="reportSection">
+                        <div class="header-report">
+                            <div class="logo-bar">
+                                <div class="logo-left">
+                                    <img src="1000181171.jpeg" alt="Indian Railways Logo" class="logo-img" width="65" height="65" />
+                                </div>
+                                <div class="heading-center">
+                                    <h2 style="font-weight: bold; font-size: 14pt; margin-bottom: 0.1cm;">CENTRAL RAILWAY</h2>
+                                    <p style="font-weight: normal; font-size: 10pt; margin-bottom: 0.1cm;">Bharatratna Dr. Babasaheb Ambedkar Memorial Hospital, Byculla, Mumbai-27</p>
+                                    <p style="font-weight: bold; font-size: 10pt; margin-bottom: 0.1cm;">BLOOD STORAGE CENTRE</p>
+                                    <p style="font-weight: bold; font-size: 8.5pt;">Licence No.: BSC/GM-03/2013</p>
+                                </div>
+                                <div class="logo-right">
+                                    <img src="1000181170.jpeg" alt="Blood Storage Centre Logo" class="logo-img" width="100" height="100" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="report-title-container">
+                            <div class="document-date">Date: <span id="reportDate">--/--/----</span></div>
+                            <h2 class="report-title">COMPATIBILITY REPORT</h2>
+                        </div>
+                        <div class="patient-info-flex">
+                            <div class="patient-info-left">
+                                <table class="patient-info-table">
+                                    <tr>
+                                        <td>Patient's Name:</td>
+                                        <td id="reportPatientName"></td>
+                                        <td>Blood Group &amp; Rh:</td>
+                                        <td id="reportPatientBloodGroup"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Age:</td>
+                                        <td id="reportPatientAge"></td>
+                                        <td>Gender:</td>
+                                        <td id="reportPatientGender"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Ward/Unit:</td>
+                                        <td id="reportPatientWard"></td>
+                                        <td>PF / CR No.:</td>
+                                        <td id="reportPatientID"></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="patient-info-qr"><div id="qrCodeContainer"></div></div>
+                        </div>
+                        <div class="report-table-container">
+                            <table class="report-table" id="reportBloodUnits">
+                                <thead>
+                                    <tr>
+                                        <th>Sr No</th>
+                                        <th>Cross Match No</th>
+                                        <th>Bag No</th>
+                                        <th>Blood Group & Rh</th>
+                                        <th>Vol. in ml.</th>
+                                        <th>Date of Collection</th>
+                                        <th>Date of Expiry</th>
+                                        <th>Compatibility</th>
+                                        <th>Date & Time Of Issue</th>
+                                        <th>Issued By</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                        <div class="report-footer">
+                            <p style="margin-bottom: 0.2cm;font-size: 9.5pt;">Cross matching has been performed using <strong>Saline, Albumin &amp; Coombs</strong> methods.</p>
+                            <p style="margin-bottom: 0.3cm;font-size: 9.5pt;">Blood units are tested Negative for <strong>HIV 1&amp;2, HBsAg, HCV, VDRL, MP &amp; Abnormal Antibodies</strong> </p>
+                            <p style="margin-bottom: 0.5cm;font-size: 9.5pt;">Reservation is valid until: <strong><span id="reportReservationDate"></span></strong></p>
+                            <p style="margin-bottom: 0.75cm;font-size: 7.5pt;text-align: center;"><strong>*Please note that after the reservation date, the blood units will be released and will no longer be available for transfusion to this patient.*</strong></p>
+                            <div class="signature-line">
+                                <div class="signature-left">
+                                    <div class="signature-technician-block">
+                                        <div class="signature-name">Cross Match Done By: <span id="reportTechnicianName">SAJITH B.S.</span></div>
+                                        <div class="cls-signature-title" id="technicianDesignation">CLS</div>
+                                    </div>
+                                </div>
+                                <div class="signature-right">
+                                    <div class="signature-name">Dr. Ashay D. Amlekar MD (Pathology)</div>
+                                    <div class="signature-title">Medical Officer</div>
+                                </div>
+                            </div>
+                            <div class="instructions">
+                                <h4>INSTRUCTIONS FOR TRANSFUSIONIST:</h4>
+                                <ol>
+                                    <li>Unit should be collected just prior to starting the transfusion. <strong>Do not store in ward refrigerators.</strong></li>
+                                    <li>Keep the blood bag at room temperature for a maximum of 30 mins to bring the temperature to room temperature.</li>
+                                    <li>Except in emergency avoid transfusion at night, both for patient's convenience and for transfusion under observation.</li>
+                                    <li>Check blood for any physical changes like hemolysis, colour, turbidity etc. Do not transfuse if there is any visible deterioration.</li>
+                                    <li>Cross check the blood group, bag no. with those on label and compatibility report.</li>
+                                    <li>Administer through the disposable transfusion set with filter.</li>
+                                    <li>Enter the time of starting transfusion.</li>
+                                    <li>Record the vital signs before and after transfusion.</li>
+                                    <li>Normal saline is the only recommended solution for use with blood.</li>
+                                    <li>Do not add any drug to the blood.</li>
+                                    <li><strong>Do not warm blood.</strong></li>
+                                    <li>Do not give IV Avil or Decadron before starting transfusion.</li>
+                                    <li>The rate of transfusion depends on the condition of the patient.</li>
+                                    <li>Observe the patient for febrile reaction, hematuria and oliguria.</li>
+                                    <li>In case of any reaction, stop the transfusion, inform the physician concerned & also intimate us.</li>
+                                </ol>
+                                <p style="margin-top: 0.3cm; font-weight: bold;text-align: center;">Blood Unit once issued will not be taken back.</p>
+                                <p style="margin-top: 0.3cm; font-weight: bold;text-align: center;">Please note that blood transfusion is a dangerous procedure. Use utmost care.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="content-3" class="tab-content hidden">
+                 <h2 class="text-2xl font-semibold text-gray-800 mb-6 border-b pb-2">Stock Inventory</h2>
+                 <div class="stock-container">
+                    <span id="printDateStock"></span>
+                    <div class="summary-container">
+                        <div class="summary-item">Total: <span id="totalBagsCount">0</span></div><div class="summary-item">A+: <span id="countA_pos">0</span></div><div class="summary-item">B+: <span id="countB_pos">0</span></div><div class="summary-item">O+: <span id="countO_pos">0</span></div><div class="summary-item">AB+: <span id="countAB_pos">0</span></div><div class="summary-item">A-: <span id="countA_neg">0</span></div><div class="summary-item">B-: <span id="countB_neg">0</span></div><div class="summary-item">O-: <span id="countO_neg">0</span></div><div class="summary-item">AB-: <span id="countAB_neg">0</span></div>
+                     </div>
+                    <div id="adminView">
+                         <h3 class="text-xl font-medium text-gray-700 mb-4 text-center">Add New Blood Bag</h3>
+                         <form id="addBagForm"><div><label for="bagPrefix_stock">Source</label><select id="bagPrefix_stock" required><option value="C-">C-</option><option value="I-">I-</option></select></div><div><label for="bagNumber">Bag No.</label><input type="text" id="bagNumber" required></div><div><label for="bloodGroup_stock">Blood Group</label><select id="bloodGroup_stock" required><option value="A+">A+</option><option value="A-">A-</option><option value="B+">B+</option><option value="B-">B-</option><option value="AB+">AB+</option><option value="AB-">AB-</option><option value="O+">O+</option><option value="O-">O-</option></select></div><div><label for="collectionDate_stock">Collection Date</label><input type="date" id="collectionDate_stock" required></div><div><label for="volume_stock">Volume (mL)</label><input type="number" id="volume_stock" min="100" max="500" value="350" required></div><div><label for="remarks_stock">Remarks</label><input type="text" id="remarks_stock" placeholder="Optional notes"></div><button type="submit">Add Bag</button></form>
+                         <button type="button" id="printButton" onclick="printStock()">Print</button>
+                         <table id="screenMatrixTable" class="matrixTable">
+                            </table>
+                     </div>
+                    <div id="publicView" style="display: none;"><div class="view-info">This is a public, read-only view...</div>
+                        <table id="publicMatrixTable" class="matrixTable">
+                            </table>
+                    </div>
+                    <table id="ledgerTable" style="display:none;"></table>
+                </div>
+            </div>
+
+            <div id="content-4" class="tab-content hidden">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-6 border-b pb-2">Archive (Previous Reports)</h2>
+                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                    <div class="md:col-span-3">
+                        <label for="archive-search" class="sr-only">Search Archive</label>
+                        <input type="search" id="archive-search" placeholder="Search by Patient Name, CR Number, or Bag Number..." class="block w-full rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 p-3 border">
+                    </div>
+                    <div><button type="button" onclick="searchArchive()" class="w-full bg-sky-500 hover:bg-sky-600 text-white font-bold py-3 px-4 rounded-lg shadow-md transition">Search</button></div>
+                </div>
+                <div class="bg-gray-50 p-6 rounded-xl shadow-inner">
+                    <h3 class="text-lg font-medium text-gray-700 mb-4">Archived Crossmatch Reports (Last 2 Months)</h3>
+                    <div class="archive-table-container">
+                        <table class="archive-table" id="archiveTable">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>CR Number</th>
+                                    <th>Patient Name</th>
+                                    <th>Blood Group</th>
+                                    <th>Units</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="7" class="text-center text-gray-500 py-6">No archived reports found.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="content-5" class="tab-content hidden">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-6 border-b pb-2">Reservations</h2>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                    <div class="md:col-span-3">
+                        <label for="reservation-search" class="sr-only">Search Reservations</label>
+                        <input type="search" id="reservation-search" placeholder="Search by Patient Name, CR Number or Bag Number..." class="block w-full rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 p-3 border">
+                    </div>
+                    <div><button type="button" onclick="displayReservations()" class="w-full bg-sky-500 hover:bg-sky-600 text-white font-bold py-3 px-4 rounded-lg shadow-md transition">Search / Refresh</button></div>
+                </div>
+
+                <div class="reservation-table-container">
+                    <table class="reservation-table" id="reservationTable">
+                        <thead>
+                            <tr>
+                                <th>Patient Name</th>
+                                <th>CR Number</th>
+                                <th>Group</th>
+                                <th>Reserved Units</th>
+                                <th>Reservation Till</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td colspan="7" class="text-center text-gray-500 py-6">No reservations found.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="text-sm text-gray-500">Reservations are automatically deleted 2 days after the reservation till date.</p>
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        // --- Helper (must be declared before functions that use it) ---
+        const d = (id) => document.getElementById(id);
+
+        // --- CUSTOM MESSAGE FUNCTION ---
+        function showCustomMessage(message) { const el = d('modal-message'); if(el) el.textContent = message; const m = d('custom-modal'); if(m) m.classList.remove('hidden'); }
+
+        // --- FIREBASE SETUP / LOCAL MODE ---
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        let db; let bloodStock = []; let registrations = []; let archive = [];
+        const LOCAL_STOCK_KEY = 'localBloodStock'; const LOCAL_REGS_KEY = 'bloodRegistrations'; const LOCAL_ARCHIVE_KEY = 'bloodArchive';
+        // NEW: Crossmatch number persistence
+        const LAST_CROSSMATCH_KEY = 'lastCrossmatchNumber';
+        if (firebaseConfig) { console.log("Firebase mode."); } else { console.warn("Local mode using localStorage."); }
+
+        // --- UTILITY FUNCTIONS ---
+        function calculateExpiryDate(dS){try{const d=new Date(dS);if(isNaN(d.getTime()))throw new Error("Invalid Date");d.setDate(d.getDate()+42);return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}catch(e){console.error("Invalid date for expiry:",dS);return""}}
+        function ddmmyy(dS){if(!dS)return'';try{let[y,m,d]=dS.split('-');if(y&&m&&d&&y.length==4)return`${d}-${m}-${y.slice(-2)}`}catch(e){}return dS;}
+        function formatDate(dt,sh=false){try{const sD=(dS)=>{if(!dS)return new Date();if(dS instanceof Date)return dS;if(typeof dS==='number')return new Date(dS);if(!dS.includes('T'))return new Date(dS+'T00:00:00');return new Date(dS);};const d=sD(dt);if(isNaN(d.getTime()))throw new Error("Invalid Date");const p=(n)=>n.toString().padStart(2,'0');if(sh){const dy=p(d.getDate());const mn=d.toLocaleString('default',{month:'short'}).toUpperCase();const yr=d.getFullYear().toString().slice(-2);return`${dy}-${mn}-${yr}`;}const dy=p(d.getDate());const mn=p(d.getMonth()+1);const yr=d.getFullYear();return`${dy}/${mn}/${yr}`}catch(e){console.error("Invalid date for format:",dt);return"Invalid Date";}}
+        function formatBloodGroupForReport(bg){
+            if(!bg || bg==='Not Provided') return 'Not Provided';
+            let g, rh;
+            if(bg.includes('AB')) {
+                g = 'AB';
+                rh = bg.slice(2);
+            } else {
+                g = bg.slice(0,1);
+                rh = bg.slice(1);
+            }
+            const rhT = rh === '+' ? 'POSITIVE' : 'NEGATIVE';
+            return `'${g}' ${rhT}`;
+        }
+        function parseBagNumber(fbn){const m=fbn.match(/^([CI]-)(.*)$/);if(m)return{prefix:m[1],number:m[2]};return{prefix:'C-',number:fbn};}
+
+        // --- CROSSMATCH NUMBER PERSISTENCE FUNCTIONS ---
+        function getNextCrossmatchNumber() {
+            const storedValue = localStorage.getItem(LAST_CROSSMATCH_KEY);
+            const currentYear = new Date().getFullYear();
+            let nextNum;
+            let yearOfData = currentYear; // Assume current year unless data says otherwise
+
+            if (!storedValue) {
+                // STATE 1: First time ever
+                // Start at 1 for 2026+, else 501 (as per original logic for 2025)
+                nextNum = (currentYear > 2025) ? 1 : 501;
+            } else {
+                try {
+                    const data = JSON.parse(storedValue);
+                    
+                    if (typeof data === 'number') {
+                        // STATE 2: Old format (e.g., 750)
+                        yearOfData = 2025; // Assume old data is from 2025
+                        if (currentYear > yearOfData) {
+                            nextNum = 1; // Reset for new year
+                            yearOfData = currentYear; // Update year for saving
+                        } else {
+                            nextNum = data + 1; // Increment existing
+                        }
+                    } else if (data.year) {
+                        // STATE 3: New format (e.g., {year: 2026, num: 120})
+                        yearOfData = data.year;
+                        if (currentYear > yearOfData) {
+                            nextNum = 1; // Reset for new year
+                            yearOfData = currentYear; // Update year for saving
+                        } else {
+                            nextNum = data.num + 1; // Increment existing
+                            yearOfData = currentYear; // Ensure year is current
+                        }
+                    } else {
+                        // Corrupted data
+                        throw new Error("Malformed data");
+                    }
+                } catch (e) {
+                    // JSON.parse failed (was old string "750") OR Malformed
+                    if (typeof storedValue === 'string' && !isNaN(parseInt(storedValue))) {
+                         // STATE 2 (string): Old format (e.g., "750")
+                        const oldNum = parseInt(storedValue);
+                        yearOfData = 2025; // Assume old data is from 2025
+                        if (currentYear > yearOfData) {
+                            nextNum = 1; // Reset for new year
+                            yearOfData = currentYear; // Update year for saving
+                        } else {
+                            nextNum = oldNum + 1; // Increment existing
+                        }
+                    } else {
+                        // Truly corrupted
+                        nextNum = (currentYear > 2025) ? 1 : 501;
+                        yearOfData = currentYear;
+                    }
+                }
+            }
+            
+            // Save the new state
+            const newState = { year: yearOfData, num: nextNum };
+            localStorage.setItem(LAST_CROSSMATCH_KEY, JSON.stringify(newState));
+            
+            return nextNum;
+        }
+
+        function setLastCrossmatchNumber(num) {
+            const currentYear = new Date().getFullYear();
+            const newState = { year: currentYear, num: parseInt(num) };
+            localStorage.setItem(LAST_CROSSMATCH_KEY, JSON.stringify(newState));
+        }
+
+        function getCurrentCrossmatchNumber() {
+            const storedValue = localStorage.getItem(LAST_CROSSMATCH_KEY);
+            const currentYear = new Date().getFullYear();
+            // Default start is 1 for 2026+, 501 for 2025
+            const defaultStart = (currentYear > 2025) ? 1 : 501;
+
+            if (!storedValue) {
+                return defaultStart;
+            }
+
+            try {
+                const data = JSON.parse(storedValue);
+                if (typeof data === 'number') {
+                    // Old format (e.g., 750)
+                    return (currentYear > 2025) ? 1 : data; // Reset if new year
+                } else if (data.year) {
+                    // New format
+                    return (currentYear > data.year) ? 1 : data.num; // Reset if new year
+                }
+            } catch (e) {
+                // Old string format
+                if (typeof storedValue === 'string' && !isNaN(parseInt(storedValue))) {
+                    const oldNum = parseInt(storedValue);
+                    return (currentYear > 2025) ? 1 : oldNum; // Reset if new year
+                }
+            }
+            
+            return defaultStart;
+        }
+
+        // --- DATA PERSISTENCE (Local Storage) ---
+        function saveBloodStockLocal(){if(!firebaseConfig){try{localStorage.setItem(LOCAL_STOCK_KEY,JSON.stringify(bloodStock));}catch(e){console.error("Err saving stock:",e);}}}
+        function saveRegistrationsLocal(){if(!firebaseConfig){try{localStorage.setItem(LOCAL_REGS_KEY,JSON.stringify(registrations));}catch(e){console.error("Err saving regs:",e);}}}
+        function saveArchiveLocal(){if(!firebaseConfig){try{localStorage.setItem(LOCAL_ARCHIVE_KEY,JSON.stringify(archive));}catch(e){console.error("Err saving archive:",e);}}}
+        function loadLocalData(){if(!firebaseConfig){try{const sS=localStorage.getItem(LOCAL_STOCK_KEY);const sR=localStorage.getItem(LOCAL_REGS_KEY);const sA=localStorage.getItem(LOCAL_ARCHIVE_KEY);bloodStock=sS?JSON.parse(sS):[];registrations=sR?JSON.parse(sR):[];archive=sA?JSON.parse(sA):[];bloodStock.forEach(b=>{if(!b.status)b.status='available'});}catch(e){console.error("Error loading local:",e);bloodStock=[];registrations=[];archive=[];}}}
+
+        // --- TAB SWITCHING ---
+        const activeClass='bg-sky-500 text-white shadow-lg';const inactiveClass='text-gray-600 hover:bg-sky-100/70 bg-white';
+        function switchTab(idx){document.querySelectorAll('.tab-content').forEach(c=>c.classList.add('hidden'));document.querySelectorAll('.tab-btn').forEach(b=>{b.classList.remove(...activeClass.split(' '));b.classList.add(...inactiveClass.split(' '));b.setAttribute('aria-selected','false');});const c=d(`content-${idx}`);if(c)c.classList.remove('hidden');const b=d(`tab-${idx}`);if(b){b.classList.remove(...inactiveClass.split(' '));b.classList.add(...activeClass.split(' '));b.setAttribute('aria-selected','true');}if(idx===1){displayCompatibleUnits();autoSetCrossmatchNumber();}if(idx===2)displayPendingRegistrations();if(idx===3)refreshAllStockUI(bloodStock,window.location.hash==='#public');if(idx===4)displayArchive();if(idx===5)displayReservations();}
+
+        // --- TAB 1: REGISTRATION & ALLOTMENT ---
+        let nextCrossMatchNumber=NaN; let selectedUnitsForCurrentPatient=[];
+        let allPatients = new Map(); // NEW: For patient suggestions
+
+        // NEW: Build patient map from archive and registrations
+        function buildPatientMap() {
+            allPatients.clear();
+            const allRecords = [...archive, ...registrations];
+            // Sort by date so latest record for a patient is processed last
+            allRecords.sort((a, b) => new Date(a.registrationTimestamp || 0) - new Date(b.registrationTimestamp || 0));
+            
+            allRecords.forEach(reg => {
+                const pd = reg.patientDetails;
+                if (pd && pd.crNumber) {
+                    // Use CR Number as a unique key
+                    allPatients.set(pd.crNumber.toLowerCase(), pd);
+                } else if (pd && pd.name) {
+                    // Fallback to name if no CR number (less reliable)
+                    allPatients.set(pd.name.toLowerCase(), pd);
+                }
+            });
+        }
+
+        // NEW: Show patient suggestions
+        function showPatientSuggestions() {
+            const input = d('patientSearch_reg').value.toLowerCase();
+            const suggestionList = d('patientSuggestionList');
+            suggestionList.innerHTML = '';
+            
+            if (input.length < 2) {
+                return;
+            }
+
+            const uniquePatients = Array.from(allPatients.values());
+            const filtered = uniquePatients.filter(pd => 
+                pd.name.toLowerCase().includes(input) || 
+                pd.crNumber.toLowerCase().includes(input)
+            );
+
+            if (filtered.length > 0) {
+                filtered.slice(0, 10).forEach(pd => { // Limit to 10 suggestions
+                    const item = document.createElement('div');
+                    item.className = 'suggestion-item';
+                    item.innerHTML = `<div class="name">${pd.name}</div><div class="details">CR: ${pd.crNumber} | ${pd.age}Y / ${pd.gender} | ${pd.bloodGroup}</div>`;
+                    item.onclick = () => selectPatientSuggestion(pd);
+                    suggestionList.appendChild(item);
+                });
+            } else {
+                suggestionList.innerHTML = `<div class="suggestion-item" style="cursor:default; background: #f8fafc;"><span class="details">No matching patients found.</span></div>`;
+            }
+        }
+
+        // NEW: Select a patient suggestion
+        function selectPatientSuggestion(pd) {
+            d('patientName_reg').value = pd.name || '';
+            d('patientAge_reg').value = pd.age || '';
+            d('patientGender_reg').value = pd.gender || '';
+            d('patientCR_reg').value = pd.crNumber || '';
+            d('patientBG_reg').value = pd.bloodGroup || '';
+            d('patientWard_reg').value = pd.ward || '';
+            
+            d('patientSearch_reg').value = '';
+            d('patientSuggestionList').innerHTML = '';
+            
+            // Trigger unit display
+            displayCompatibleUnits();
+        }
+
+        
+        // NEW: Auto-set crossmatch number on tab load
+        function autoSetCrossmatchNumber() {
+            const nextCM = getNextCrossmatchNumber();
+            nextCrossMatchNumber = nextCM;
+            const cmEl = d('crossMatchStart_reg');
+            if (cmEl) {
+                cmEl.value = nextCM;
+            }
+        }
+        
+        function getCompatibleGroups(pg){const c={'A+':['A+','A-','O+','O-'],'A-':['A-','O-'],'B+':['B+','B-','O+','O-'],'B-':['B-','O-'],'AB+':['A+','A-','B+','B-','AB+','AB-','O+','O-'],'AB-':['A-','B-','AB-','O-'],'O+':['O+','O-'],'O-':['O-']};return c[pg]||[];}
+        function displayCompatibleUnits(){const pg=d('patientBG_reg').value;const cg=getCompatibleGroups(pg);const body=d('availableUnitsTable').querySelector('tbody');body.innerHTML='';if(!pg){body.innerHTML='<tr><td colspan="5" class="text-center text-gray-500 py-6">Select patient blood group.</td></tr>';return;}const selIds=selectedUnitsForCurrentPatient.map(u=>u.id);const stock=bloodStock.filter(b=>cg.includes(b.group)&&!selIds.includes(b.id)&&b.status!=='allotted').sort((a,b)=>new Date(a.collectionDate)-new Date(b.collectionDate));if(stock.length===0){body.innerHTML='<tr><td colspan="5" class="text-center text-gray-500 py-6">No compatible units available.</td></tr>';return;}stock.forEach(b=>{const r=body.insertRow(); r.innerHTML=`<td class="font-medium">${b.bagNumber}</td><td>${b.group}</td><td>${ddmmyy(b.expiryDate)}</td><td class="status-${b.status}">${b.status}</td><td><button type="button" class="action-btn btn-select-unit" data-bag-id="${b.id}">Select</button></td>`;});body.querySelectorAll('.btn-select-unit').forEach(btn=>btn.onclick=(e)=>{ const bagId = (e.currentTarget||e.target).dataset.bagId; selectUnitForCurrentPatient(bagId); });}
+        function selectUnitForCurrentPatient(id){ if(isNaN(nextCrossMatchNumber)){ showCustomMessage("Set starting cross-match no."); const el = d('crossMatchStart_reg'); if(el) el.focus(); return; } const b=bloodStock.find(x=>x.id===id); if(!b) return; if(b.status && b.status!=='available'){ showCustomMessage(`Already allotted: ${b.bagNumber}`); return; } selectedUnitsForCurrentPatient.push({...b,assignedCrossMatch:nextCrossMatchNumber}); nextCrossMatchNumber++; const el = d('crossMatchStart_reg'); if(el) el.value = isNaN(nextCrossMatchNumber)?'':nextCrossMatchNumber; renderSelectedUnitsForCurrentPatient(); displayCompatibleUnits(); }
+        function removeUnitForCurrentPatient(id){ selectedUnitsForCurrentPatient=selectedUnitsForCurrentPatient.filter(b=>b.id!==id); renderSelectedUnitsForCurrentPatient(); displayCompatibleUnits(); }
+        function renderSelectedUnitsForCurrentPatient(){const bd=d('selectedUnitsTable').querySelector('tbody');bd.innerHTML='';if(selectedUnitsForCurrentPatient.length===0){bd.innerHTML='<tr><td colspan="3" class="text-center text-gray-500 py-6">No units selected.</td></tr>';return;}selectedUnitsForCurrentPatient.forEach(b=>{const r=bd.insertRow();r.innerHTML=`<td class="font-bold">${b.assignedCrossMatch}</td><td class="font-medium">${b.bagNumber}</td><td><button type="button" class="action-btn btn-remove-unit" data-bag-id="${b.id}">Remove</button></td>`;});bd.querySelectorAll('.btn-remove-unit').forEach(btn=>btn.onclick=(e)=>{ const bagId = (e.currentTarget||e.target).dataset.bagId; removeUnitForCurrentPatient(bagId); });}
+        
+        // NEW: Function to get reservation date (manual or default)
+        function getReservationDate() {
+            const manualDate = d('reservationDate_reg').value;
+            if (manualDate) {
+                return manualDate;
+            }
+            // Default: 48 hours from now
+            const defaultDate = new Date();
+            defaultDate.setDate(defaultDate.getDate() + 2);
+            return defaultDate.toISOString().split('T')[0];
+        }
+        
+        function saveRegistration(){
+            const pd={
+                name:d('patientName_reg').value.trim(),
+                age:d('patientAge_reg').value.trim(),
+                gender:d('patientGender_reg').value,
+                crNumber:d('patientCR_reg').value.trim(),
+                bloodGroup:d('patientBG_reg').value,
+                ward:d('patientWard_reg').value.trim()
+            };
+            if(!pd.name||!pd.crNumber||!pd.bloodGroup){showCustomMessage("Name, CR No, Blood Group required.");return;}
+            if(selectedUnitsForCurrentPatient.length===0){showCustomMessage("Select unit(s).");return;}
+            
+            const id=pd.crNumber+'-'+Date.now();
+            const reg={
+                id,
+                patientDetails:pd,
+                allottedUnits:selectedUnitsForCurrentPatient,
+                registrationTimestamp:new Date().toISOString(),
+                status:'pending_crossmatch',
+                // NEW: Save reservation date
+                reservationDate: getReservationDate()
+            };
+            registrations.push(reg);
+            saveRegistrationsLocal();
+            buildPatientMap(); // NEW: Update patient map
+            let su=false;
+            selectedUnitsForCurrentPatient.forEach(u=>{const i=bloodStock.find(b=>b.id===u.id);if(i&&i.status==='available'){i.status='allotted';su=true;}else if(i)console.warn(`Already ${i.status}: ${i.bagNumber}`);else console.error(`Stock item not found: ${u.id}`);});
+            if(su){saveBloodStockLocal();refreshAllStockUI(bloodStock,window.location.hash==='#public');}
+            
+            // NEW: Update last crossmatch number used
+            if (selectedUnitsForCurrentPatient.length > 0) {
+                const lastUsed = selectedUnitsForCurrentPatient[selectedUnitsForCurrentPatient.length - 1].assignedCrossMatch;
+                setLastCrossmatchNumber(lastUsed);
+            }
+            
+            d('patientSearch_reg').value = ''; // NEW: Clear search
+            d('patientSuggestionList').innerHTML = ''; // NEW: Clear suggestions
+            d('patientName_reg').value='';d('patientAge_reg').value='';d('patientGender_reg').value='';d('patientCR_reg').value='';d('patientBG_reg').value='';d('patientWard_reg').value='';d('reservationDate_reg').value=''; // NEW: Clear reservation date
+            selectedUnitsForCurrentPatient=[];
+            renderSelectedUnitsForCurrentPatient();
+            displayCompatibleUnits();
+            showCustomMessage(`Patient ${pd.name} registered, ${reg.allottedUnits.length} unit(s) allotted.`);
+            if(!d('content-2').classList.contains('hidden'))displayPendingRegistrations();
+        }
+
+        // --- TAB 2: REPORT GENERATION & REGISTRATION LIST ---
+        // --- Improved: ensure reservationDate exists, persist before printing, keep a copy in archive ---
+        function prepareReportForPatient(id, printNow = true) {
+            const reg = registrations.find(r => r.id === id);
+            if (!reg) {
+                showCustomMessage("Registration data not found.");
+                return;
+            }
+
+            const pd = reg.patientDetails || {};
+            const units = reg.allottedUnits || [];
+
+            // Ensure reservationDate exists (so the Reservations tab will show it)
+            if (!reg.reservationDate) {
+                const dflt = new Date();
+                dflt.setDate(dflt.getDate() + 2);
+                reg.reservationDate = dflt.toISOString().split('T')[0];
+            }
+
+            // Persist any changes immediately so UI lists pick them up
+            if (!reg.status) reg.status = 'pending_crossmatch';
+            saveRegistrationsLocal();
+
+            // Populate report fields
+            d('reportPatientName').textContent = pd.name || 'N/A';
+            d('reportPatientAge').textContent = (pd.age || 'N/A') + (pd.age ? ' Yrs' : '');
+            d('reportPatientGender').textContent = pd.gender || 'N/A';
+            d('reportPatientBloodGroup').textContent = formatBloodGroupForReport(pd.bloodGroup);
+            d('reportPatientWard').textContent = pd.ward || 'N/A';
+            d('reportPatientID').textContent = pd.crNumber || 'N/A';
+            d('reportDate').textContent = formatDate(new Date());
+            
+            // Set technician name and designation based on selection
+            const technicianSelect = d('technicianSelect');
+            const selectedTechnician = technicianSelect ? technicianSelect.value : 'SAJITH B.S.';
+            d('reportTechnicianName').textContent = selectedTechnician.split(' (')[0]; // Remove designation from name
+            
+            // Set designation based on technician - FIXED: SAJITH B.S. & SATHEESH MANI to be 'CLS', others 'LS'
+            const technicianName = selectedTechnician.split(' (')[0];
+            const designation = (technicianName === 'SAJITH B.S.' || technicianName === 'SATHEESH MANI') ? 'CLS' : 'LS';
+            d('technicianDesignation').textContent = designation;
+            
+            d('reportReservationDate').textContent = formatDate(reg.reservationDate);
+
+            const body = d('reportBloodUnits').querySelector('tbody');
+            body.innerHTML = '';
+            const yS = new Date().getFullYear().toString().slice(-2);
+
+            // Build QR code text
+            let qrData = `Name:${pd.name || 'N/A'}`;
+            qrData += `\n${pd.age || 'N/A'}${pd.age ? 'Y/' : ''}${pd.gender === 'MALE' ? 'M' : pd.gender === 'FEMALE' ? 'F' : ''}`;
+            qrData += `\nCR No:${pd.crNumber || 'N/A'}`;
+            units.forEach((u, i) => qrData += `\nBag${i+1}:${u.bagNumber || 'N/A'}`);
+
+            const qrC = d('qrCodeContainer');
+            qrC.innerHTML = '';
+
+            // render table rows - FIXED: Apply bold styling to all cells except 'COMPATIBLE'
+            units.forEach((u, i) => {
+                const sr = i + 1;
+                let cm = u.assignedCrossMatch ? u.assignedCrossMatch.toString() : 'N/A';
+                if (cm !== 'N/A') cm = cm.padStart(2, '0') + '/' + yS;
+                const bn = u.bagNumber || 'N/A';
+                const bg = formatBloodGroupForReport(u.group);
+                const v = u.volume || 'N/A';
+                const cl = u.collectionDate ? formatDate(u.collectionDate, true) : 'N/A';
+                const ex = u.expiryDate ? formatDate(u.expiryDate, true) : 'N/A';
+                const row = body.insertRow();
+                // Apply bold styling to all cells except 'COMPATIBLE'
+                row.innerHTML = `<td style="font-weight: bold;">${sr}</td><td style="font-weight: bold;">${cm}</td><td style="font-weight: bold;">${bn}</td><td style="font-weight: bold;">${bg}</td><td style="font-weight: bold;">${v}${v!=='N/A'?'ml.':''}</td><td style="font-weight: bold;">${cl}</td><td style="font-weight: bold;">${ex}</td><td>COMPATIBLE</td><td style="font-weight: bold;"></td><td style="font-weight: bold;"></td>`;
+            });
+
+            // generate QR (best-effort)
+            try { new QRCode(qrC, { text: qrData, width: 100, height: 100, correctLevel: QRCode.CorrectLevel.M }); } catch (e) { console.warn("QR gen failed", e); }
+
+            d('reportSection').style.display = 'block';
+
+            if (!printNow) return;
+
+            // Persist status and refresh UI before opening print (so Reservations shows data)
+            reg.status = 'crossmatch_ok';
+            saveRegistrationsLocal();
+            displayPendingRegistrations();
+            displayReservations();
+            refreshAllStockUI(bloodStock, window.location.hash === '#public');
+
+            // allow QR to render
+            setTimeout(() => {
+                let qrSrc = null;
+                const canvas = qrC.querySelector('canvas');
+                const img = qrC.querySelector('img');
+                if (canvas && canvas.toDataURL) qrSrc = canvas.toDataURL('image/png');
+                else if (img && img.src) qrSrc = img.src;
+
+                const reportHtml = buildPrintableReportHtml(d('reportSection').innerHTML, qrSrc);
+                openPrintWindow(reportHtml);
+
+                // archive a copy but DO NOT remove the active registration so Reservations still lists it
+                archiveRegistration(reg.id, { removeSource: false });
+            }, 150);
+        }
+
+        function buildPrintableReportHtml(reportInnerHTML, qrSrc) {
+            const css = `
+                @page { 
+                    size: A4 portrait; 
+                    margin: 0.5cm; 
+                }
+                html, body { 
+                    margin: 0; 
+                    padding: 0; 
+                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+                    color: #333; 
+                    line-height: 1.3;
+                }
+                .report-container { 
+                    padding: 1cm; 
+                    width: 21cm; 
+                    box-sizing: border-box; 
+                }
+                .header-report {
+                    margin-bottom: 0.4cm;
+                    padding-bottom: 0.25cm;
+                    border-bottom: 2px solid #e53935;
+                }
+                .logo-bar {
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
+                    justify-content: space-between;
+                    width: 100%;
+                }
+                .logo-left, .logo-right {
+                    flex: 1;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                }
+                .logo-left img {
+                   width: auto;
+                   height: auto;
+                   max-width: 65px;
+                   max-height: 65px;
+                }
+                .logo-right img {
+                   width: auto;
+                   height: auto;
+                   max-width: 90px;  /* Increased from 65px */
+                   max-height: 90px; /* Increased from 65px */
+                }
+                .heading-center {
+                    flex: 2;
+                    text-align: center;
+                }
+                .heading-center h2 {
+                    font-size: 13pt;
+                    margin: 0;
+                    font-weight: bold;
+                }
+                .heading-center p {
+                    margin: 0.1cm 0;
+                    font-weight: normal;
+                    font-size: 10pt;
+                }
+                .report-title-container {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    margin: 0.25cm 0;
+                }
+                .document-date {
+                    font-weight: bold;
+                    font-size: 9pt;
+                    margin-bottom: 0.4cm;
+                    text-align: right;
+                    width: 100%;
+                }
+                .report-title {
+                    color: #c62828;
+                    font-size: 12pt;
+                    text-align: center;
+                    margin-bottom: 0.4cm;
+                    font-weight: normal;
+                }
+                .patient-info-flex {
+                    display: flex;
+                    flex-direction: row;
+                    align-items: flex-start;
+                    width: 100%;
+                    margin-bottom: 0.4cm;
+                    position: relative;
+                }
+                .patient-info-left {
+                    flex: 2 1 0;
+                    margin-right: 2cm;
+                }
+                .patient-info-qr {
+                    flex: 0 0 100px;
+                    display: flex;
+                    align-items: flex-start;
+                    justify-content: flex-end;
+                    min-width: 100px;
+                    position: absolute;
+                    right: 0;
+                    top: 0;
+                }
+                #qrCodeContainer {
+                    width: 85px;
+                    height: 85px;
+                    background: #fff;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border: 1px solid #ccc;
+                }
+                #qrCodeContainer img,
+                #qrCodeContainer canvas {
+                    width: 100% !important;
+                    height: 100% !important;
+                    max-width: 100%;
+                    max-height: 100%;
+                }
+                .patient-info-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-bottom: 0.4cm;
+                    font-size: 9pt;
+                }
+                .patient-info-table td {
+                    padding: 0.18cm;
+                    vertical-align: top;
+                }
+                .patient-info-table td:nth-child(even) {
+                    font-weight: 700;
+                }
+                .report-table {
+                    border-collapse: collapse;
+                    font-size: 8.5pt;
+                    width: 100%;
+                }
+                .report-table, .report-table th, .report-table td {
+                    border: 1px solid #ddd;
+                }
+                .report-table th, .report-table td {
+                    padding: 0.15cm;
+                    text-align: center;
+                    font-weight: normal;
+                }
+                .report-table th:nth-child(1), .report-table td:nth-child(1) { width: 4%; }
+                .report-table th:nth-child(2), .report-table td:nth-child(2) { width: 9%; }
+                .report-table th:nth-child(3), .report-table td:nth-child(3) { width: 10%; }
+                .report-table th:nth-child(4), .report-table td:nth-child(4) { width: 12%; }
+                .report-table th:nth-child(5), .report-table td:nth-child(5) { width: 7%; }
+                .report-table th:nth-child(6), .report-table td:nth-child(6) { width: 11%; }
+                .report-table th:nth-child(7), .report-table td:nth-child(7) { width: 11%; }
+                .report-table th:nth-child(8), .report-table td:nth-child(8) { width: 10%; }
+                .report-table th:nth-child(9), .report-table td:nth-child(9) { width: 14%; }
+                .report-table th:nth-child(10), .report-table td:nth-child(10) { width: 12%; }
+                .signature-line {
+                    display: flex;
+                    justify-content: space-between;
+                    margin-top: 1.3cm;
+                    padding-top: 0.3cm;
+                    border-top: 1px solid #ddd;
+                }
+                .signature-name {
+                    font-weight: 700;
+                    margin-bottom: 0.05cm;
+                    width: 100%;
+                    font-size: 8.5pt;
+                }
+                .cls-signature-title, .signature-title {
+                    font-size: 7.5pt;
+                    color: #555;
+                    font-weight: normal;
+                    text-align: center;
+                    width: 100%;
+                }
+                .cls-signature-title {
+                    margin-left: 1.4cm;
+                }
+                .instructions {
+                    margin-top: 0.4cm;
+                    padding: 0.25cm;
+                    background-color: #f9f9f9;
+                    border-left: 4px solid #c62828;
+                    font-size: 7.5pt;
+                }
+            `;
+            
+            let content = reportInnerHTML;
+            
+            // Replace the QR code container with the actual QR code
+            if (qrSrc) {
+                content = content.replace(
+                    /<div id="qrCodeContainer">[\s\S]*?<\/div>/,
+                    `<div id="qrCodeContainer"><img src="${qrSrc}" alt="QR Code"></div>`
+                );
+            }
+            
+            return `<!doctype html><html><head><meta charset="utf-8"><title>Compatibility Report</title><style>${css}</style></head><body><div class="report-container">${content}</div></body></html>`;
+        }
+        
+        // --- TAB 3 & PRINTING ---
+        function openPrintWindow(htmlContent) {
+            const printWindow = window.open('', '_blank');
+            if (!printWindow) {
+                showCustomMessage("Popup blocked. Please allow popups for this site to print.");
+                return;
+            }
+            printWindow.document.open();
+            printWindow.document.write(htmlContent);
+            printWindow.document.close();
+            printWindow.onload = function() {
+                setTimeout(function() { // Timeout helps ensure styles are applied before print dialog opens
+                    try {
+                        printWindow.focus();
+                        printWindow.print();
+                        printWindow.close();
+                    } catch (e) {
+                        console.error("Print failed in popup:", e);
+                        showCustomMessage("An error occurred during printing.");
+                    }
+                }, 250);
+            };
+        }
+
+        function updateRegistrationStatus(id, newStatus) { 
+            const reg = registrations.find(r => r.id === id); 
+            if (!reg) return false; 
+            reg.status = newStatus; 
+            saveRegistrationsLocal(); 
+            refreshAllStockUI(bloodStock, window.location.hash === '#public'); 
+            displayPendingRegistrations(); 
+            if (newStatus && (/crossmatch.*ok/i.test(newStatus) || newStatus === 'crossmatch_ok' || newStatus === 'crossmatch ok')) { 
+                setTimeout(() => prepareReportForPatient(id, true), 200); 
+            } 
+            return true; 
+        }
+        
+        function displayPendingRegistrations() {
+             const tableBody = d('pendingRegistrationsTable').querySelector('tbody');
+             const searchTerm = (d('registrationSearch')?.value || '').toLowerCase();
+             tableBody.innerHTML = '';
+             const filteredRegs = registrations.filter(reg => (reg.status === 'pending_crossmatch' || reg.status === 'crossmatch_ok' || reg.status === 'crossmatch ok') && (!searchTerm || reg.patientDetails.name.toLowerCase().includes(searchTerm) || reg.patientDetails.crNumber.toLowerCase().includes(searchTerm)));
+             if (filteredRegs.length === 0) { tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-gray-500 py-6">No pending regs found${searchTerm ? ' matching search' : ''}.</td></tr>`; return; }
+             filteredRegs.sort((a,b) => new Date(b.registrationTimestamp) - new Date(a.registrationTimestamp));
+             filteredRegs.forEach(reg => { const r = tableBody.insertRow(); r.innerHTML = `<td>${reg.patientDetails.crNumber}</td><td>${reg.patientDetails.name}</td><td>${reg.patientDetails.bloodGroup}</td><td>${reg.allottedUnits.length}</td><td class="status-${reg.status}">${reg.status.replace('_',' ')}</td><td><button type="button" class="action-btn btn-prepare-report" data-reg-id="${reg.id}">Prepare & Print</button><button type="button" class="action-btn btn-delete-registration" data-reg-id="${reg.id}">Cancel</button></td>`; });
+             tableBody.querySelectorAll('.btn-prepare-report').forEach(btn => btn.onclick = (e) => prepareReportForPatient((e.currentTarget||e.target).dataset.regId, true));
+             tableBody.querySelectorAll('.btn-delete-registration').forEach(btn => btn.onclick = (e) => cancelRegistration((e.currentTarget||e.target).dataset.regId));
+         }
+         
+         function cancelRegistration(id) {
+             if (!confirm("Cancel registration & release units?")) return;
+             const idx = registrations.findIndex(r => r.id === id); if (idx === -1) return; const reg = registrations[idx];
+             let su = false; reg.allottedUnits.forEach(u => { const i = bloodStock.find(b => b.id === u.id); if (i) { i.status = 'available'; su = true; } else console.warn("Stock item not found:", u.id); });
+             if (su) saveBloodStockLocal();
+             registrations.splice(idx, 1); saveRegistrationsLocal();
+             buildPatientMap(); // NEW: Update patient map
+             displayPendingRegistrations(); refreshAllStockUI(bloodStock, window.location.hash === '#public'); showCustomMessage("Registration cancelled.");
+             const currentReportPatientId = d('reportPatientID')?.textContent;
+             if (currentReportPatientId === reg.patientDetails.crNumber) { d('reportSection').style.display = 'none'; }
+         }
+
+        // --- NEW printStock function (based on index.html layout) ---
+        function printStock() {
+            if (bloodStock.length === 0) {
+                showCustomMessage("Stock is empty. Nothing to print.");
+                return;
+            }
+            
+            const stockDate = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+            
+            // --- Build table HTML based on index.html logic ---
+            const pos = ["A+","B+","O+","AB+"], neg = ["A-","B-","O-","AB-"];
+            let byPos={},byNeg={};pos.forEach(g=>byPos[g]=[]);neg.forEach(g=>byNeg[g]=[]);
+            bloodStock.forEach(b=>{ if(byPos[b.group])byPos[b.group].push(b); if(byNeg[b.group])byNeg[b.group].push(b); });
+            for(let g of pos)byPos[g].sort((a,b)=>new Date(a.collectionDate)-new Date(b.collectionDate));
+            for(let g of neg)byNeg[g].sort((a,b)=>new Date(a.collectionDate)-new Date(b.collectionDate));
+            const pmax=Math.max(...pos.map(g=>byPos[g].length)), nmax=Math.max(...neg.map(g=>byNeg[g].length));
+            
+            let matrixBodyPos = '';
+            for(let i=0;i<pmax;++i){
+                matrixBodyPos += '<tr>';
+                pos.forEach((g, ki) => {
+                    const b = byPos[g][i];
+                    let tdClass = '';
+                    if (ki === 0) tdClass += 'matrix-thick-left ';
+                    // Corrected logic: last group (ki === 3) AND last cell (k=3)
+                    if (ki === pos.length - 1) tdClass += 'matrix-thick-right ';
+                    
+                    if (b) {
+                        matrixBodyPos += `<td class="${tdClass.replace('matrix-thick-right', '')}">${b.bagNumber}</td>`;
+                        matrixBodyPos += `<td class="${tdClass.replace('matrix-thick-right', '')}">${ddmmyy(b.collectionDate)}</td>`;
+                        matrixBodyPos += `<td class="${tdClass.replace('matrix-thick-right', '')}">${ddmmyy(b.expiryDate)}</td>`;
+                        matrixBodyPos += `<td class="${tdClass}">${b.volume}</td>`;
+                    } else {
+                        matrixBodyPos += `<td class="${tdClass.replace('matrix-thick-right', '')}">&nbsp;</td><td class="${tdClass.replace('matrix-thick-right', '')}">&nbsp;</td><td class="${tdClass.replace('matrix-thick-right', '')}">&nbsp;</td><td class="${tdClass}">&nbsp;</td>`;
+                    }
+                });
+                matrixBodyPos += '</tr>';
+            }
+             if (pmax === 0) {
+                 matrixBodyPos += '<tr>';
+                 pos.forEach((g, ki) => {
+                    let tdClass = (ki === 0 ? 'matrix-thick-left ' : '') + (ki === pos.length - 1 ? 'matrix-thick-right ' : '');
+                    matrixBodyPos += `<td class="${tdClass.replace('matrix-thick-right', '')}">&nbsp;</td><td class="${tdClass.replace('matrix-thick-right', '')}">&nbsp;</td><td class="${tdClass.replace('matrix-thick-right', '')}">&nbsp;</td><td class="${tdClass}">&nbsp;</td>`;
+                 });
+                 matrixBodyPos += '</tr>';
+            }
+
+
+            let matrixBodyNeg = '';
+            for(let i=0;i<nmax;++i){
+                matrixBodyNeg += '<tr>';
+                neg.forEach((g, ki) => {
+                    const b = byNeg[g][i];
+                    let tdClass = '';
+                    if (ki === 0) tdClass += 'matrix-thick-left ';
+                    if (ki === neg.length - 1) tdClass += 'matrix-thick-right ';
+
+                    if (b) {
+                        matrixBodyNeg += `<td class="${tdClass.replace('matrix-thick-right', '')}">${b.bagNumber}</td>`;
+                        matrixBodyNeg += `<td class="${tdClass.replace('matrix-thick-right', '')}">${ddmmyy(b.collectionDate)}</td>`;
+                        matrixBodyNeg += `<td class="${tdClass.replace('matrix-thick-right', '')}">${ddmmyy(b.expiryDate)}</td>`;
+                        matrixBodyNeg += `<td class="${tdClass}">${b.volume}</td>`;
+                    } else {
+                        matrixBodyNeg += `<td class="${tdClass.replace('matrix-thick-right', '')}">&nbsp;</td><td class="${tdClass.replace('matrix-thick-right', '')}">&nbsp;</td><td class="${tdClass.replace('matrix-thick-right', '')}">&nbsp;</td><td class="${tdClass}">&nbsp;</td>`;
+                    }
+                });
+                matrixBodyNeg += '</tr>';
+            }
+            if (nmax === 0) {
+                 matrixBodyNeg += '<tr>';
+                 neg.forEach((g, ki) => {
+                    let tdClass = (ki === 0 ? 'matrix-thick-left ' : '') + (ki === neg.length - 1 ? 'matrix-thick-right ' : '');
+                    matrixBodyNeg += `<td class="${tdClass.replace('matrix-thick-right', '')}">&nbsp;</td><td class="${tdClass.replace('matrix-thick-right', '')}">&nbsp;</td><td class="${tdClass.replace('matrix-thick-right', '')}">&nbsp;</td><td class="${tdClass}">&nbsp;</td>`;
+                 });
+                 matrixBodyNeg += '</tr>';
+            }
+            
+            const gridHtml = `
+                <table class="matrixTable">
+                    <thead>
+                        <tr>
+                            <th colspan="4" class="group-header matrix-thick-left">A+</th>
+                            <th colspan="4" class="group-header matrix-thick-left">B+</th>
+                            <th colspan="4" class="group-header matrix-thick-left">O+</th>
+                            <th colspan="4" class="group-header matrix-thick-left matrix-thick-right">AB+</th>
+                        </tr>
+                        <tr>
+                            <th class="sub-header matrix-thick-left">Bag No.</th><th class="sub-header">Collection</th><th class="sub-header">Expiry</th><th class="sub-header">Vol.</th>
+                            <th class="sub-header matrix-thick-left">Bag No.</th><th class="sub-header">Collection</th><th class="sub-header">Expiry</th><th class="sub-header">Vol.</th>
+                            <th class="sub-header matrix-thick-left">Bag No.</th><th class="sub-header">Collection</th><th class="sub-header">Expiry</th><th class="sub-header">Vol.</th>
+                            <th class="sub-header matrix-thick-left">Bag No.</th><th class="sub-header">Collection</th><th class="sub-header">Expiry</th><th class="sub-header matrix-thick-right">Vol.</th>
+                        </tr>
+                    </thead>
+                    <tbody>${matrixBodyPos}</tbody>
+                    <thead>
+                        <tr>
+                            <th colspan="4" class="group-header matrix-thick-left">A-</th>
+                            <th colspan="4" class="group-header matrix-thick-left">B-</th>
+                            <th colspan="4" class="group-header matrix-thick-left">O-</th>
+                            <th colspan="4" class="group-header matrix-thick-left matrix-thick-right">AB-</th>
+                        </tr>
+                        <tr>
+                            <th class="sub-header matrix-thick-left">Bag No.</th><th class="sub-header">Collection</th><th class="sub-header">Expiry</th><th class="sub-header">Vol.</th>
+                            <th class="sub-header matrix-thick-left">Bag No.</th><th class="sub-header">Collection</th><th class="sub-header">Expiry</th><th class="sub-header">Vol.</th>
+                            <th class="sub-header matrix-thick-left">Bag No.</th><th class="sub-header">Collection</th><th class="sub-header">Expiry</th><th class="sub-header">Vol.</th>
+                            <th class="sub-header matrix-thick-left">Bag No.</th><th class="sub-header">Collection</th><th class="sub-header">Expiry</th><th class="sub-header matrix-thick-right">Vol.</th>
+                        </tr>
+                    </thead>
+                    <tbody>${matrixBodyNeg}</tbody>
+                </table>
+            `;
+
+            // --- Get styles from index.html print block ---
+            const printStyles = `
+                @page { size:A4 landscape; margin:8mm;}
+                body{ 
+                    font-family: Arial, sans-serif; 
+                    margin:0; 
+                    font-size:10pt;
+                    text-align:left; 
+                    background: white;
+                    -webkit-print-color-adjust: exact !important;
+                    color-adjust: exact !important;
+                }
+                .print-container { width: 100%; height: 100%; }
+                .print-header { 
+                    text-align: center; 
+                    margin-bottom: 10px; 
+                }
+                .print-header h2 { 
+                    font-size: 16pt; 
+                    margin: 0; 
+                    color: #2c5282;
+                }
+                .print-header p { 
+                    font-size: 12pt; 
+                    margin: 4px 0 0 0; 
+                    font-weight: bold;
+                }
+                .summary-container{ 
+                    display: flex !important; 
+                    margin: 10px auto 14px auto; 
+                    border: 1px solid #999; 
+                    background:#ebf8ff !important; 
+                    padding: 8px;
+                    flex-wrap: wrap;
+                    justify-content: center;
+                    gap: 6px;
+                }
+                .summary-item{
+                    font-size: 0.9em;
+                    text-align: center;
+                    font-weight: bold;
+                    padding: 3px 6px;
+                    min-width: 50px;
+                    background-color: #fff !important;
+                    border-radius: 4px;
+                    border: 1px solid #bee3f8;
+                }
+                .matrixTable { width:100%; margin:0; table-layout:fixed; border-collapse:collapse; font-size:0.97em; }
+                .matrixTable th, .matrixTable td{ border:1px solid #333 !important; padding:2px 5px; text-align:center; }
+                .matrix-thick-right { border-right: 3.8px double #700 !important;}
+                .matrix-thick-left { border-left: 3.8px double #700 !important;}
+                .group-header { background:#2c5282 !important; color:#fff !important; letter-spacing:2px; border-bottom:2px solid #1a365d !important; font-size:1em; }
+                .sub-header { background:#bee3f8 !important; font-weight:bold; }
+                .print-footer {
+                    margin-top: 10px;
+                    text-align: center;
+                    font-size: 8pt;
+                    color: #666;
+                    border-top: 1px solid #ccc;
+                    padding-top: 5px;
+                }
+            `;
+
+            const printHtml = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Blood Stock Report</title>
+                    <style>${printStyles}</style>
+                </head>
+                <body>
+                    <div class="print-container">
+                        <div class="print-header">
+                            <h2>Blood Stock Report</h2>
+                            <p>Dr. BAM Hospital Blood Storage Centre - As on: ${stockDate}</p>
+                        </div>
+                        <div class="summary-container">
+                            <div class="summary-item">Total: <span>${bloodStock.length}</span></div>
+                            <div class="summary-item">A+: <span>${bloodStock.filter(b => b.group === 'A+').length}</span></div>
+                            <div class="summary-item">B+: <span>${bloodStock.filter(b => b.group === 'B+').length}</span></div>
+                            <div class="summary-item">O+: <span>${bloodStock.filter(b => b.group === 'O+').length}</span></div>
+                            <div class="summary-item">AB+: <span>${bloodStock.filter(b => b.group === 'AB+').length}</span></div>
+                            <div class="summary-item">A-: <span>${bloodStock.filter(b => b.group === 'A-').length}</span></div>
+                            <div class="summary-item">B-: <span>${bloodStock.filter(b => b.group === 'B-').length}</span></div>
+                            <div class="summary-item">O-: <span>${bloodStock.filter(b => b.group === 'O-').length}</span></div>
+                            <div class="summary-item">AB-: <span>${bloodStock.filter(b => b.group === 'AB-').length}</span></div>
+                        </div>
+                        ${gridHtml}
+                        <div class="print-footer">
+                            Generated on: ${new Date().toLocaleString()} | Total Bags: ${bloodStock.length}
+                        </div>
+                    </div>
+                </body>
+                </html>`;
+            
+            openPrintWindow(printHtml);
+        }
+
+        // --- TAB 4: ARCHIVE FUNCTIONALITY ---
+        /**
+         * Archive registration.
+         * options.removeSource = true|false (default true) controls whether the original registration is removed.
+         */
+        function archiveRegistration(registrationId, options = { removeSource: true }) {
+            const reg = registrations.find(r => r.id === registrationId);
+            if (!reg) return;
+
+            // Skip if already archived
+            if (archive.find(a => a.id === registrationId)) return;
+
+            const archivedRecord = {
+                ...reg,
+                archivedTimestamp: new Date().toISOString(),
+                archiveStatus: 'completed'
+            };
+
+            archive.push(archivedRecord);
+            saveArchiveLocal();
+            buildPatientMap(); // NEW: Update patient map
+
+            // Remove source only when explicitly requested AND when crossmatch completed
+            if (options.removeSource === true && (reg.status === 'crossmatch_ok' || reg.status === 'crossmatch ok')) {
+                const idx = registrations.findIndex(r => r.id === registrationId);
+                if (idx !== -1) {
+                    registrations.splice(idx, 1);
+                    saveRegistrationsLocal();
+                }
+            }
+
+            cleanupOldArchive();
+        }
+
+        function cleanupOldArchive() {
+            const twoMonthsAgo = new Date();
+            twoMonthsAgo.setMonth(twoMonthsAgo.getMonth() - 2);
+
+            archive = archive.filter(record => {
+                const recordDate = new Date(record.archivedTimestamp || record.registrationTimestamp);
+                return recordDate >= twoMonthsAgo;
+            });
+
+            saveArchiveLocal();
+        }
+
+        function displayArchive() {
+            const tableBody = d('archiveTable').querySelector('tbody');
+            const searchTerm = (d('archive-search')?.value || '').toLowerCase();
+
+            // reset table
+            tableBody.innerHTML = '';
+
+            // Filter archive records for last 2 months
+            const twoMonthsAgo = new Date();
+            twoMonthsAgo.setMonth(twoMonthsAgo.getMonth() - 2);
+
+            let filteredArchive = archive.filter(record => {
+                const recordDate = new Date(record.archivedTimestamp || record.registrationTimestamp);
+                return recordDate >= twoMonthsAgo;
+            });
+
+            // Apply search filter
+            if (searchTerm) {
+                filteredArchive = filteredArchive.filter(record => 
+                    record.patientDetails.name.toLowerCase().includes(searchTerm) ||
+                    record.patientDetails.crNumber.toLowerCase().includes(searchTerm) ||
+                    record.allottedUnits.some(unit => unit.bagNumber.toLowerCase().includes(searchTerm))
+                );
+            }
+
+            if (filteredArchive.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="7" class="text-center text-gray-500 py-6">No archived reports found${searchTerm ? ' matching search' : ''}.</td></tr>`;
+                return;
+            }
+
+            // Sort by date (newest first)
+            filteredArchive.sort((a, b) => new Date(b.archivedTimestamp || b.registrationTimestamp) - new Date(a.archivedTimestamp || a.registrationTimestamp));
+
+            filteredArchive.forEach(record => {
+                const row = tableBody.insertRow();
+                const recordDate = new Date(record.archivedTimestamp || record.registrationTimestamp);
+                const bagNumbers = record.allottedUnits.map(unit => unit.bagNumber).join(', ');
+
+                row.innerHTML = `
+                    <td>${formatDate(recordDate)}</td>
+                    <td>${record.patientDetails.crNumber}</td>
+                    <td>${record.patientDetails.name}</td>
+                    <td>${record.patientDetails.bloodGroup}</td>
+                    <td>${record.allottedUnits.length} (${bagNumbers})</td>
+                    <td>${record.status || 'completed'}</td>
+                    <td>
+                        <button type="button" class="btn-archive-print" data-reg-id="${record.id}">Print Report</button>
+                        <button type="button" class="btn-archive-delete" data-reg-id="${record.id}">Delete</button>
+                    </td>
+                `;
+            });
+
+            // Add event listeners
+            tableBody.querySelectorAll('.btn-archive-print').forEach(btn => {
+                btn.onclick = (e) => {
+                    const regId = (e.currentTarget||e.target).dataset.regId;
+                    printArchivedReport(regId);
+                };
+            });
+
+            tableBody.querySelectorAll('.btn-archive-delete').forEach(btn => {
+                btn.onclick = (e) => {
+                    const regId = (e.currentTarget||e.target).dataset.regId;
+                    deleteArchivedRecord(regId);
+                };
+            });
+        }
+
+        function searchArchive() {
+            displayArchive();
+        }
+
+        function printArchivedReport(registrationId) {
+            const archivedRecord = archive.find(r => r.id === registrationId);
+            if (!archivedRecord) {
+                showCustomMessage("Archived record not found.");
+                return;
+            }
+
+            // Create a temporary registration from archive data for printing
+            const tempRegistration = {
+                ...archivedRecord,
+                id: archivedRecord.id + '_temp_' + Date.now()
+            };
+
+            // Temporarily add to registrations for printing
+            registrations.push(tempRegistration);
+
+            // Use the existing report preparation function
+            prepareReportForPatient(tempRegistration.id, true);
+
+            // Remove temporary registration after printing
+            setTimeout(() => {
+                const idx = registrations.findIndex(r => r.id === tempRegistration.id);
+                if (idx !== -1) {
+                    registrations.splice(idx, 1);
+                    saveRegistrationsLocal();
+                }
+            }, 1000);
+        }
+
+        function deleteArchivedRecord(registrationId) {
+            if (!confirm("Are you sure you want to permanently delete this archived record?")) return;
+
+            const idx = archive.findIndex(r => r.id === registrationId);
+            if (idx !== -1) {
+                archive.splice(idx, 1);
+                saveArchiveLocal();
+                buildPatientMap(); // NEW: Update patient map
+                displayArchive();
+                showCustomMessage("Archived record deleted successfully.");
+            }
+        }
+
+        async function addBag(fbn,g,cd,v,r) { const exp=calculateExpiryDate(cd); if(!exp){showCustomMessage("Invalid Date.");return;} const bag={id:Date.now().toString(),bagNumber:fbn,group:g,collectionDate:cd,expiryDate:exp,volume:v,remarks:r||'',status:'available'}; if(firebaseConfig&&db){}else{if(bloodStock.find(b=>b.bagNumber===fbn)){showCustomMessage(`Bag ${fbn} exists!`);return;}bloodStock.push(bag);bloodStock.sort((a,b)=>new Date(a.collectionDate)-new Date(b.collectionDate));saveBloodStockLocal();refreshAllStockUI(bloodStock,false);}}
+        function deleteBag(id) { const idx=bloodStock.findIndex(b=>b.id===id); if(idx===-1)return; const bag=bloodStock[idx]; if(bag.status==='allotted'){showCustomMessage(`Bag ${bag.bagNumber} is allotted.`);return;} if(confirm(`Remove Bag ${bag.bagNumber}?`)){if(firebaseConfig&&db){}else{bloodStock.splice(idx,1);saveBloodStockLocal();refreshAllStockUI(bloodStock,false);}}}
+        function updateSummaryBadges(s){const c={'A+':0,'B+':0,'AB+':0,'O+':0,'A-':0,'B-':0,'AB-':0,'O-':0};s.forEach(b=>{if(c.hasOwnProperty(b.group))c[b.group]++;});d('totalBagsCount').textContent=s.length;d('countA_pos').textContent=c['A+'];d('countB_pos').textContent=c['B+'];d('countAB_pos').textContent=c['AB+'];d('countO_pos').textContent=c['O+'];d('countA_neg').textContent=c['A-'];d('countB_neg').textContent=c['B-'];d('countAB_neg').textContent=c['AB-'];d('countO_neg').textContent=c['O-'];}
+        
+        // --- NEW renderAdminMatrix (from index.html) ---
+        function renderAdminMatrix(stock) {
+            const container = d('screenMatrixTable');
+            if (!container) return;
+            container.innerHTML = `
+                <thead>
+                    <tr>
+                        <th colspan="4" class="group-header matrix-thick-left">A+</th>
+                        <th colspan="4" class="group-header matrix-thick-left">B+</th>
+                        <th colspan="4" class="group-header matrix-thick-left">O+</th>
+                        <th colspan="4" class="group-header matrix-thick-left matrix-thick-right">AB+</th>
+                    </tr>
+                    <tr>
+                        <th class="sub-header matrix-thick-left">Bag No.</th><th class="sub-header">Collection</th><th class="sub-header">Expiry</th><th class="sub-header">Vol.</th>
+                        <th class="sub-header matrix-thick-left">Bag No.</th><th class="sub-header">Collection</th><th class="sub-header">Expiry</th><th class="sub-header">Vol.</th>
+                        <th class="sub-header matrix-thick-left">Bag No.</th><th class="sub-header">Collection</th><th class="sub-header">Expiry</th><th class="sub-header">Vol.</th>
+                        <th class="sub-header matrix-thick-left">Bag No.</th><th class="sub-header">Collection</th><th class="sub-header">Expiry</th><th class="sub-header matrix-thick-right">Vol.</th>
+                    </tr>
+                </thead>
+                <tbody id="screenMatrixBodyPos"></tbody>
+                <thead>
+                    <tr>
+                        <th colspan="4" class="group-header matrix-thick-left">A-</th>
+                        <th colspan="4" class="group-header matrix-thick-left">B-</th>
+                        <th colspan="4" class="group-header matrix-thick-left">O-</th>
+                        <th colspan="4" class="group-header matrix-thick-left matrix-thick-right">AB-</th>
+                    </tr>
+                    <tr>
+                        <th class="sub-header matrix-thick-left">Bag No.</th><th class="sub-header">Collection</th><th class="sub-header">Expiry</th><th class="sub-header">Vol.</th>
+                        <th class="sub-header matrix-thick-left">Bag No.</th><th class="sub-header">Collection</th><th class="sub-header">Expiry</th><th class="sub-header">Vol.</th>
+                        <th class="sub-header matrix-thick-left">Bag No.</th><th class="sub-header">Collection</th><th class="sub-header">Expiry</th><th class="sub-header">Vol.</th>
+                        <th class="sub-header matrix-thick-left">Bag No.</th><th class="sub-header">Collection</th><th class="sub-header">Expiry</th><th class="sub-header matrix-thick-right">Vol.</th>
+                    </tr>
+                </thead>
+                <tbody id="screenMatrixBodyNeg"></tbody>
+            `;
+            const pos = ["A+","B+","O+","AB+"], neg = ["A-","B-","O-","AB-"];
+            let byPos={},byNeg={};pos.forEach(g=>byPos[g]=[]);neg.forEach(g=>byNeg[g]=[]);
+            stock.forEach(b=>{ if(byPos[b.group])byPos[b.group].push(b); if(byNeg[b.group])byNeg[b.group].push(b); });
+            for(let g of pos)byPos[g].sort((a,b)=>new Date(a.collectionDate)-new Date(b.collectionDate));
+            for(let g of neg)byNeg[g].sort((a,b)=>new Date(a.collectionDate)-new Date(b.collectionDate));
+            const pmax=Math.max(...pos.map(g=>byPos[g].length)), nmax=Math.max(...neg.map(g=>byNeg[g].length));
+            const mbp=d('screenMatrixBodyPos'),mbn=d('screenMatrixBodyNeg');
+
+            for(let i=0;i<pmax;++i){
+                const row=document.createElement('tr');
+                pos.forEach((g, ki) => {
+                    const b = byPos[g][i];
+                    for (let k = 0; k < 4; ++k) {
+                        let td = document.createElement('td');
+                        if (k === 0) td.className += 'matrix-thick-left ';
+                        if (ki === pos.length - 1 && k === 3) td.className += 'matrix-thick-right ';
+                        if (b) {
+                            if (k == 0) { 
+                                td.textContent = b.bagNumber; 
+                                const btn = document.createElement('button'); 
+                                btn.textContent = "X"; 
+                                btn.className = "remove-btn-matrix"; 
+                                btn.onclick = () => deleteBag(b.id); 
+                                td.appendChild(btn); 
+                            }
+                            else if (k == 1) td.textContent = ddmmyy(b.collectionDate);
+                            else if (k == 2) td.textContent = ddmmyy(b.expiryDate);
+                            else if (k == 3) td.textContent = b.volume + 'mL'; // Added 'mL' for consistency
+                        } else {
+                            td.innerHTML = '&nbsp;'; // Add non-breaking space to render borders
+                        }
+                        row.appendChild(td);
+                    }
+                });
+                mbp.appendChild(row);
+            }
+            // Add a blank row if empty
+            if (pmax === 0) {
+                 const row=document.createElement('tr');
+                 pos.forEach((g, ki) => {
+                     for (let k = 0; k < 4; ++k) {
+                        let td = document.createElement('td');
+                        if (k === 0) td.className += 'matrix-thick-left ';
+                        if (ki === pos.length - 1 && k === 3) td.className += 'matrix-thick-right ';
+                        td.innerHTML = '&nbsp;';
+                        row.appendChild(td);
+                     }
+                 });
+                 mbp.appendChild(row);
+            }
+
+            for(let i=0;i<nmax;++i){
+                const row=document.createElement('tr');
+                neg.forEach((g, ki) => {
+                    const b = byNeg[g][i];
+                    for (let k = 0; k < 4; ++k) {
+                        let td = document.createElement('td');
+                        if (k === 0) td.className += 'matrix-thick-left ';
+                        if (ki === neg.length - 1 && k === 3) td.className += 'matrix-thick-right ';
+                        if (b) {
+                            if (k == 0) { 
+                                td.textContent = b.bagNumber; 
+                                const btn = document.createElement('button'); 
+                                btn.textContent = "X"; 
+                                btn.className = "remove-btn-matrix"; 
+                                btn.onclick = () => deleteBag(b.id); 
+                                td.appendChild(btn); 
+                            }
+                            else if (k == 1) td.textContent = ddmmyy(b.collectionDate);
+                            else if (k == 2) td.textContent = ddmmyy(b.expiryDate);
+                            else if (k == 3) td.textContent = b.volume + 'mL'; // Added 'mL'
+                        } else {
+                             td.innerHTML = '&nbsp;';
+                        }
+                        row.appendChild(td);
+                    }
+                });
+                mbn.appendChild(row);
+            }
+            // Add a blank row if empty
+             if (nmax === 0) {
+                 const row=document.createElement('tr');
+                 neg.forEach((g, ki) => {
+                     for (let k = 0; k < 4; ++k) {
+                        let td = document.createElement('td');
+                        if (k === 0) td.className += 'matrix-thick-left ';
+                        if (ki === neg.length - 1 && k === 3) td.className += 'matrix-thick-right ';
+                        td.innerHTML = '&nbsp;';
+                        row.appendChild(td);
+                     }
+                 });
+                 mbn.appendChild(row);
+            }
+        }
+
+        // --- NEW renderPublicMatrix (from index.html) ---
+        function renderPublicMatrix(stock) { 
+            const container = d('publicMatrixTable');
+            if (!container) return;
+            container.innerHTML = `
+                <thead>
+                    <tr>
+                        <th class="group-header matrix-thick-left">A+</th>
+                        <th class="group-header matrix-thick-left">B+</th>
+                        <th class="group-header matrix-thick-left">O+</th>
+                        <th class="group-header matrix-thick-left matrix-thick-right">AB+</th>
+                    </tr>
+                </thead>
+                <tbody id="publicMatrixBodyPos"></tbody>
+                <thead>
+                    <tr>
+                        <th class="group-header matrix-thick-left">A-</th>
+                        <th class="group-header matrix-thick-left">B-</th>
+                        <th class="group-header matrix-thick-left">O-</th>
+                        <th class="group-header matrix-thick-left matrix-thick-right">AB-</th>
+                    </tr>
+                </thead>
+                <tbody id="publicMatrixBodyNeg"></tbody>
+            `;
+            const pos = ["A+","B+","O+","AB+"], neg = ["A-","B-","O-","AB-"];
+            let byPos={},byNeg={};pos.forEach(g=>byPos[g]=[]);neg.forEach(g=>byNeg[g]=[]);
+            stock.forEach(b=>{ if(byPos[b.group])byPos[b.group].push(b); if(byNeg[b.group])byNeg[b.group].push(b); });
+            for(let g of pos)byPos[g].sort((a,b)=>new Date(a.collectionDate)-new Date(b.collectionDate));
+            for(let g of neg)byNeg[g].sort((a,b)=>new Date(a.collectionDate)-new Date(b.collectionDate));
+            const pmax=Math.max(...pos.map(g=>byPos[g].length)), nmax=Math.max(...neg.map(g=>byNeg[g].length));
+            const mbp=d('publicMatrixBodyPos'),mbn=d('publicMatrixBodyNeg');
+
+            for (let i = 0; i < pmax; ++i) {
+                const row = document.createElement('tr');
+                pos.forEach((g, ki) => {
+                    const b = byPos[g][i];
+                    let td = document.createElement('td');
+                    if (ki === 0) td.className += 'matrix-thick-left ';
+                    if (ki === pos.length - 1) td.className += 'matrix-thick-right ';
+                    if (b) { td.textContent = b.bagNumber; }
+                    else { td.innerHTML = '&nbsp;'; }
+                    row.appendChild(td);
+                });
+                mbp.appendChild(row);
+            }
+             if (pmax === 0) {
+                 const row=document.createElement('tr');
+                 pos.forEach((g, ki) => {
+                    let td = document.createElement('td');
+                    if (ki === 0) td.className += 'matrix-thick-left ';
+                    if (ki === pos.length - 1) td.className += 'matrix-thick-right ';
+                    td.innerHTML = '&nbsp;';
+                    row.appendChild(td);
+                 });
+                 mbp.appendChild(row);
+            }
+
+            for (let i = 0; i < nmax; ++i) {
+                const row = document.createElement('tr');
+                neg.forEach((g, ki) => {
+                    const b = byNeg[g][i];
+                    let td = document.createElement('td');
+                    if (ki === 0) td.className += 'matrix-thick-left ';
+                    if (ki === neg.length - 1) td.className += 'matrix-thick-right ';
+                    if (b) { td.textContent = b.bagNumber; }
+                    else { td.innerHTML = '&nbsp;'; }
+                    row.appendChild(td);
+                });
+                mbn.appendChild(row);
+            }
+            if (nmax === 0) {
+                 const row=document.createElement('tr');
+                 neg.forEach((g, ki) => {
+                    let td = document.createElement('td');
+                    if (ki === 0) td.className += 'matrix-thick-left ';
+                    if (ki === neg.length - 1) td.className += 'matrix-thick-right ';
+                    td.innerHTML = '&nbsp;';
+                    row.appendChild(td);
+                 });
+                 mbn.appendChild(row);
+            }
+        }
+
+        function refreshAllStockUI(stock, isPublicView) { try { updateSummaryBadges(stock); renderAdminMatrix(stock); if (isPublicView) renderPublicMatrix(stock); if (!d('content-1').classList.contains('hidden')) displayCompatibleUnits(); if (!d('content-2').classList.contains('hidden')) displayPendingRegistrations(); } catch (e) { console.error("UI refresh error:", e); } }
+        function listenForUpdates(isPublicView) { if (firebaseConfig && db) { /* Firebase logic */ } else { loadLocalData(); buildPatientMap(); refreshAllStockUI(bloodStock,isPublicView); if (!d('content-2').classList.contains('hidden')) displayPendingRegistrations(); } }
+
+        // --- RESERVATIONS: NEW TAB FUNCTIONS ---
+        function getReservationsFromRegistrations() {
+            // Reservations are registrations which have reservationDate set.
+            // We'll present pending_crossmatch as 'reserved', and allow cancelled state.
+            return registrations.filter(r => r.reservationDate && (r.status === 'pending_crossmatch' || r.status === 'reserved' || r.status === 'cancelled_reservation' || r.status === 'crossmatch_ok' || !r.status));
+        }
+
+        function displayReservations() {
+            // First run cleanup of expired reservations
+            cleanupExpiredReservations();
+
+            const tableBody = d('reservationTable').querySelector('tbody');
+            const searchTerm = (d('reservation-search')?.value || '').toLowerCase();
+            tableBody.innerHTML = '';
+            const allRes = getReservationsFromRegistrations();
+            let filtered = allRes.filter(rec => {
+                // search by name, cr, bag number
+                if (!searchTerm) return true;
+                const name = (rec.patientDetails.name || '').toLowerCase();
+                const cr = (rec.patientDetails.crNumber || '').toLowerCase();
+                const bags = rec.allottedUnits.map(u => (u.bagNumber || '').toLowerCase()).join(' ');
+                return name.includes(searchTerm) || cr.includes(searchTerm) || bags.includes(searchTerm);
+            });
+
+            if (filtered.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="7" class="text-center text-gray-500 py-6">No reservations found${searchTerm ? ' matching search' : ''}.</td></tr>`;
+                return;
+            }
+
+            // sort by reservationDate ascending (nearest first)
+            filtered.sort((a,b) => new Date(a.reservationDate) - new Date(b.reservationDate));
+
+            filtered.forEach(rec => {
+                const tr = tableBody.insertRow();
+                const pd = rec.patientDetails || {};
+                
+                // NEW: Build vertical bag list
+                let bagListHtml = '';
+                if (!rec.allottedUnits || rec.allottedUnits.length === 0) {
+                    bagListHtml = '<span class="text-gray-500 text-sm">No units</span>';
+                } else {
+                    rec.allottedUnits.forEach(unit => {
+                        bagListHtml += `
+                            <div class="bag-item">
+                                <span>${unit.bagNumber}</span>
+                                <button class="btn-issue-bag" data-reg-id="${rec.id}" data-bag-number="${unit.bagNumber}">Issue</button>
+                            </div>
+                        `;
+                    });
+                }
+                
+                const resTill = formatDate(rec.reservationDate);
+                let dispStatus = (rec.status === 'pending_crossmatch' || rec.status === 'reserved') ? 'Reserved' : (rec.status === 'cancelled_reservation' || rec.status === 'cancelled' ? 'Cancelled' : rec.status || 'Reserved');
+                const statusClass = dispStatus.toLowerCase().startsWith('cancel') ? 'reservation-status-cancelled' : 'reservation-status-reserved';
+                
+                tr.innerHTML = `
+                    <td>${pd.name || ''}</td>
+                    <td>${pd.crNumber || ''}</td>
+                    <td>${pd.bloodGroup || ''}</td>
+                    <td class="bag-list-cell">${bagListHtml}</td>
+                    <td>${resTill}</td>
+                    <td class="${statusClass}">${dispStatus}</td>
+                    <td>
+                        <button class="btn-res-edit" data-res-id="${rec.id}">Edit</button>
+                        <button class="btn-res-delete" data-res-id="${rec.id}">Delete</button>
+                    </td>
+                `;
+            });
+
+            // attach handlers
+            tableBody.querySelectorAll('.btn-res-edit').forEach(btn => btn.onclick = (e) => {
+                const id = (e.currentTarget||e.target).dataset.resId;
+                openReservationModal(id);
+            });
+
+            tableBody.querySelectorAll('.btn-res-delete').forEach(btn => btn.onclick = (e) => {
+                const id = (e.currentTarget||e.target).dataset.resId;
+                deleteReservation(id);
+            });
+            
+            // NEW: Add handlers for issue buttons
+            tableBody.querySelectorAll('.btn-issue-bag').forEach(btn => btn.onclick = (e) => {
+                const target = e.currentTarget || e.target;
+                const regId = target.dataset.regId;
+                const bagNumber = target.dataset.bagNumber;
+                issueReservedBag(regId, bagNumber);
+            });
+        }
+        
+        // NEW: Function to issue a single reserved bag
+        function issueReservedBag(regId, bagNumber) {
+            if (!confirm(`Are you sure you want to issue bag ${bagNumber}? This will remove it from the reservation.`)) {
+                return;
+            }
+
+            const regIndex = registrations.findIndex(r => r.id === regId);
+            if (regIndex === -1) {
+                showCustomMessage("Error: Reservation not found.");
+                return;
+            }
+            
+            const reg = registrations[regIndex];
+            
+            // Find and remove the bag from the registration's allottedUnits
+            const bagIndex = reg.allottedUnits.findIndex(u => u.bagNumber === bagNumber);
+            if (bagIndex === -1) {
+                showCustomMessage("Error: Bag not found in this reservation.");
+                return;
+            }
+            
+            reg.allottedUnits.splice(bagIndex, 1);
+            
+            // If last bag is issued, remove the entire registration
+            if (reg.allottedUnits.length === 0) {
+                registrations.splice(regIndex, 1);
+                showCustomMessage(`Bag ${bagNumber} issued. This was the last unit; reservation for ${reg.patientDetails.name} has been removed.`);
+            } else {
+                showCustomMessage(`Bag ${bagNumber} issued. ${reg.allottedUnits.length} unit(s) remaining for ${reg.patientDetails.name}.`);
+            }
+            
+            saveRegistrationsLocal();
+            displayReservations(); // Refresh the reservation list
+        }
+
+
+        function openReservationModal(regId) {
+            const reg = registrations.find(r => r.id === regId);
+            if (!reg) { showCustomMessage("Reservation not found."); return; }
+            d('reservation_edit_id').value = reg.id;
+            d('reservation_edit_name').value = reg.patientDetails.name || '';
+            d('reservation_edit_cr').value = reg.patientDetails.crNumber || '';
+            d('reservation_edit_group').value = reg.patientDetails.bloodGroup || '';
+            d('reservation_edit_bags').value = (reg.allottedUnits || []).map(u=>u.bagNumber).join(', ');
+            // ensure date value in yyyy-mm-dd for input
+            let rd = reg.reservationDate;
+            if (!rd) {
+                const dd = new Date(); dd.setDate(dd.getDate()+2); rd = dd.toISOString().split('T')[0];
+            }
+            d('reservation_edit_till').value = rd;
+            d('reservation_edit_status').value = (reg.status === 'cancelled_reservation' || reg.status === 'cancelled') ? 'cancelled' : 'reserved';
+            d('reservation-modal').classList.remove('hidden');
+        }
+
+        function closeReservationModal() {
+            d('reservation-modal').classList.add('hidden');
+        }
+
+        function saveReservationEdit() {
+            const id = d('reservation_edit_id').value;
+            const reg = registrations.find(r => r.id === id);
+            if (!reg) { showCustomMessage("Registration not found."); closeReservationModal(); return; }
+            const newDate = d('reservation_edit_till').value;
+            const newStatus = d('reservation_edit_status').value;
+
+            // Validate date
+            if (!newDate || isNaN(new Date(newDate).getTime())) { showCustomMessage("Enter valid reservation till date."); return; }
+
+            reg.reservationDate = newDate;
+            if (newStatus === 'cancelled') {
+                // release units and mark cancelled
+                reg.status = 'cancelled_reservation';
+                (reg.allottedUnits || []).forEach(u => {
+                    const s = bloodStock.find(b => b.id === u.id);
+                    if (s) s.status = 'available';
+                });
+                saveBloodStockLocal();
+            } else {
+                // reserved
+                reg.status = 'pending_crossmatch';
+            }
+
+            saveRegistrationsLocal();
+            refreshAllStockUI(bloodStock, window.location.hash === '#public');
+            displayReservations();
+            closeReservationModal();
+            showCustomMessage("Reservation updated.");
+        }
+
+        function deleteReservation(regId) {
+            if (!confirm("Delete reservation and release allocated units? This is permanent.")) return;
+            const idx = registrations.findIndex(r => r.id === regId);
+            if (idx === -1) { showCustomMessage("Reservation not found."); return; }
+            const reg = registrations[idx];
+            // release units
+            (reg.allottedUnits || []).forEach(u => {
+                const s = bloodStock.find(b => b.id === u.id);
+                if (s) s.status = 'available';
+            });
+            saveBloodStockLocal();
+            registrations.splice(idx,1);
+            saveRegistrationsLocal();
+            buildPatientMap(); // NEW: Update patient map
+            refreshAllStockUI(bloodStock, window.location.hash === '#public');
+            displayReservations();
+            showCustomMessage("Reservation deleted and units released.");
+        }
+
+        function cleanupExpiredReservations() {
+            // Remove entries which are 2 days past reservationDate (i.e., reservationDate + 2 days < today)
+            const now = new Date();
+            let removed = 0;
+            // iterate over a copy to safely remove
+            const regsCopy = [...registrations];
+            regsCopy.forEach(reg => {
+                if (!reg.reservationDate) return;
+                const resDate = new Date(reg.reservationDate + 'T23:59:59'); // treat as end of day
+                const expiryDate = new Date(resDate);
+                expiryDate.setDate(expiryDate.getDate() + 2);
+                if (now > expiryDate) {
+                    // release units
+                    (reg.allottedUnits || []).forEach(u => {
+                        const s = bloodStock.find(b => b.id === u.id);
+                        if (s) s.status = 'available';
+                    });
+                    // remove from registrations
+                    const idx = registrations.findIndex(r => r.id === reg.id);
+                    if (idx !== -1) {
+                        registrations.splice(idx,1);
+                    }
+                    removed++;
+                }
+            });
+            if (removed > 0) {
+                saveBloodStockLocal();
+                saveRegistrationsLocal();
+                buildPatientMap(); // NEW: Update patient map
+                refreshAllStockUI(bloodStock, window.location.hash === '#public');
+                console.log(`Auto-deleted ${removed} expired reservation(s).`);
+            }
+        }
+
+        // run cleanup periodically (every hour)
+        let reservationCleanupInterval = null;
+        function startReservationCleanupInterval() {
+            if (reservationCleanupInterval) clearInterval(reservationCleanupInterval);
+            // run every hour
+            reservationCleanupInterval = setInterval(() => {
+                cleanupExpiredReservations();
+            }, 1000 * 60 * 60);
+        }
+
+        // expose reservation functions to global (so dev console or inline calls work)
+        window.displayReservations = displayReservations;
+        window.openReservationModal = openReservationModal;
+        window.closeReservationModal = closeReservationModal;
+        window.saveReservationEdit = saveReservationEdit;
+        window.deleteReservation = deleteReservation;
+        window.cleanupExpiredReservations = cleanupExpiredReservations;
+        window.issueReservedBag = issueReservedBag; // NEW: Expose issue function
+
+        // --- GLOBAL EXPOSURE ---
+        window.switchTab=switchTab; window.deleteBag=deleteBag; window.printStock=printStock; window.selectUnitForCurrentPatient=selectUnitForCurrentPatient; window.removeUnitForCurrentPatient=removeUnitForCurrentPatient; window.prepareReportForPatient=prepareReportForPatient; window.cancelRegistration=cancelRegistration; window.updateRegistrationStatus=updateRegistrationStatus; window.searchArchive=searchArchive; window.printArchivedReport=printArchivedReport; window.deleteArchivedRecord=deleteArchivedRecord; window.displayReservations = displayReservations;
+
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+             if (!firebaseConfig) { 
+                 loadLocalData(); 
+                 buildPatientMap(); // NEW: Build patient map on load
+             }
+            switchTab(1);
+            const isPublic=window.location.hash==='#public'; const adminV=d('adminView'),publicV=d('publicView'); if(adminV&&publicV){if(isPublic){adminV.style.display='none';publicV.style.display='block';}else{adminV.style.display='block';publicV.style.display='none';}} const printDEl=d('printDateStock'); if(printDEl){const t=new Date();printDEl.textContent=`Stock Date: ${t.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})}`;} const addF=d('addBagForm'); if(addF){const dI=d('collectionDate_stock');if(dI)dI.value=new Date().toISOString().slice(0,10);addF.onsubmit=function(e){e.preventDefault();const p=d('bagPrefix_stock').value,n=d('bagNumber').value.trim(),f=p+n,g=d('bloodGroup_stock').value,cd=d('collectionDate_stock').value,v=parseInt(d('volume_stock').value,10),r=d('remarks_stock').value.trim();if(n==="") {showCustomMessage("Enter Bag No.");return;}addBag(f,g,cd,v,r);d('bagNumber').value='';d('remarks_stock').value='';d('bagNumber').focus();};}
+            // safe listeners
+            const bgEl = d('patientBG_reg');
+            if (bgEl) bgEl.addEventListener('change', displayCompatibleUnits);
+            const cmEl = d('crossMatchStart_reg');
+            if (cmEl) cmEl.addEventListener('change',(e)=>{const n=parseInt(e.target.value,10);nextCrossMatchNumber=isNaN(n)?NaN:n;});
+            const regBtn = d('registerAndAllotBtn');
+            if (regBtn) regBtn.addEventListener('click', saveRegistration);
+            const regSearch = d('registrationSearch');
+            if (regSearch) regSearch.addEventListener('input', displayPendingRegistrations);
+            const resSearch = d('reservation-search');
+            if (resSearch) resSearch.addEventListener('input', displayReservations);
+
+            // NEW: Add listener for patient search
+            const patSearch = d('patientSearch_reg');
+            if (patSearch) patSearch.addEventListener('input', showPatientSuggestions);
+
+            // Initialize technician selector
+            const technicianSelect = d('technicianSelect');
+            if (technicianSelect) {
+                technicianSelect.addEventListener('change', function() {
+                    // Update the report preview when technician changes
+                    const currentReportPatientId = d('reportPatientID')?.textContent;
+                    if (currentReportPatientId && currentReportPatientId !== '--/--/----') {
+                        // If there's a report currently displayed, update it
+                        const reg = registrations.find(r => r.patientDetails.crNumber === currentReportPatientId);
+                        if (reg) {
+                            prepareReportForPatient(reg.id, false);
+                        }
+                    }
+                });
+            }
+
+            // start reservation cleanup
+            cleanupExpiredReservations();
+            startReservationCleanupInterval();
+
+            if (!firebaseConfig) { refreshAllStockUI(bloodStock, isPublic); displayPendingRegistrations(); displayReservations(); }
+            else { listenForUpdates(isPublic); }
+        });
+    </script>
+</body>
+</html>
