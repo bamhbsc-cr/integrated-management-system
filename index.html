@@ -354,7 +354,8 @@
 /* --- NEW: Style for Make Ready Button */
 .btn-make-ready { background-color: #3b82f6; color: white; border: none; }
 .btn-make-ready:hover { background-color: #2563eb; }
-
+.btn-edit-registration { background-color: #f59e0b; color: white; border: none; }
+        .btn-edit-registration:hover { background-color: #d97706; }
 /* --- NEW: Shared style for small buttons in the matrix */
 .action-btn-matrix {
     border: none;
@@ -372,10 +373,13 @@
 }
 /* NEW: Color for the ready button */
 .ready-btn-matrix {
-    background: #3b82f6; /* Blue */
+    background: none; /* Removes background */
+    padding: 2px 4px; /* Adjust padding slightly */
+    color: #334155; /* Sets a default dark color for the icon */
 }
 .ready-btn-matrix:hover {
-    background: #2563eb;
+    background: none; /* Ensures no background on hover */
+    color: #1e3a8a;   /* Darkens the icon on hover */
 }
 
 	/* --- STYLES FOR BLOOD STOCK (TAB 3) --- */
@@ -496,31 +500,7 @@
         .modal-backdrop { background: rgba(0,0,0,0.5); position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 60; }
         .modal-card { background: #fff; padding: 20px; border-radius: 8px; width: 100%; max-width: 560px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
         
-        /* Technician selector styles */
-        .technician-selector {
-            margin-top: 0.6cm;
-            padding: 0.4cm;
-            background: #f0f8ff;
-            border-radius: 6px;
-            border: 1px solid #b8daff;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .technician-selector label {
-            font-weight: 700;
-            color: #004085;
-            font-size: 10pt;
-        }
-        .technician-selector select {
-            padding: 0.2cm 0.4cm;
-            border: 1px solid #99c2ff;
-            border-radius: 4px;
-            font-weight: 600;
-            color: #004085;
-            font-size: 10pt;
-            width: 60%;
-        }
+        
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -596,11 +576,11 @@
     <div class="flex flex-col flex-1 container mx-auto px-4 py-8">
         <div class="bg-white p-2 rounded-xl shadow-lg mb-8">
             <div class="flex space-x-2 md:space-x-4 justify-center" role="tablist">
-                 <button type="button" id="tab-1" onclick="switchTab(1)" class="tab-btn active w-full md:w-auto px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none" role="tab" aria-controls="content-1" aria-selected="true">1. Registration & Allotment</button>
-                 <button type="button" id="tab-2" onclick="switchTab(2)" class="tab-btn w-full md:w-auto px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none" role="tab" aria-controls="content-2" aria-selected="false">2. Compatibility Report</button>
-                 <button type="button" id="tab-3" onclick="switchTab(3)" class="tab-btn w-full md:w-auto px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none" role="tab" aria-controls="content-3" aria-selected="false">3. Stock Inventory</button>
-                 <button type="button" id="tab-4" onclick="switchTab(4)" class="tab-btn w-full md:w-auto px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none" role="tab" aria-controls="content-4" aria-selected="false">4. Archive</button>
-                 <button type="button" id="tab-5" onclick="switchTab(5)" class="tab-btn w-full md:w-auto px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none" role="tab" aria-controls="content-5" aria-selected="false">5. Reservations</button>
+                 <button type="button" id="tab-1"  class="tab-btn active w-full md:w-auto px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none" role="tab" aria-controls="content-1" aria-selected="true">REGISTRATION</button>
+                 <button type="button" id="tab-2"  class="tab-btn w-full md:w-auto px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none" role="tab" aria-controls="content-2" aria-selected="false">VALIDATION</button>
+                 <button type="button" id="tab-3"  class="tab-btn w-full md:w-auto px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none" role="tab" aria-controls="content-3" aria-selected="false">BLOOD INVENTORY</button>
+                 <button type="button" id="tab-4"  class="tab-btn w-full md:w-auto px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none" role="tab" aria-controls="content-4" aria-selected="false">RESERVATIONS</button>
+                 <button type="button" id="tab-5"  class="tab-btn w-full md:w-auto px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none" role="tab" aria-controls="content-5" aria-selected="false">ARCHIVE</button>
             </div>
         </div>
 
@@ -648,7 +628,7 @@
 
             <div id="content-2" class="tab-content hidden">
                  <!-- Content for Tab 2: Report Generation -->
-                 <h2 class="text-2xl font-semibold text-gray-800 mb-6 border-b pb-2">Pending Registrations & Report Generation</h2>
+                 <h2 class="text-2xl font-semibold text-gray-800 mb-6 border-b pb-2">Crossmatch Validation  & Report Generation</h2>
                  <div id="pendingRegistrationsSection" class="mb-8">
                      <div class="mb-4">
                          <label for="registrationSearch" class="block text-sm font-medium text-gray-700 mb-1">Search Pending Registrations:</label>
@@ -665,9 +645,9 @@
                  <hr class="my-8 border-gray-300">
                  
                  <!-- Technician Selector -->
-                 <div class="technician-selector">
-                    <label for="technicianSelect">Cross Match Done By:</label>
-                    <select id="technicianSelect">
+                 <div class="my-6 p-4 bg-sky-50 rounded-lg border border-sky-200 flex items-center justify-between">
+                    <label for="technicianSelect" class="text-sm font-semibold text-sky-800">Cross Match Done By:</label>
+                    <select id="technicianSelect" class="w-3/5 p-2 border border-sky-300 rounded-md shadow-sm font-semibold text-sky-800 text-sm focus:border-sky-500 focus:ring-sky-500">
                         <option value="SAJITH B.S.">SAJITH B.S. (CLS)</option>
                         <option value="SATHEESH MANI">SATHEESH MANI (CLS)</option>
                         <option value="JOHN DOE">JOHN DOE (LS)</option>
@@ -811,7 +791,37 @@
             </div>
 
             <div id="content-4" class="tab-content hidden">
-                <!-- Content for Tab 4: Archive -->
+                <h2 class="text-2xl font-semibold text-gray-800 mb-6 border-b pb-2">Reservations</h2>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                    <div class="md:col-span-3">
+                        <label for="reservation-search" class="sr-only">Search Reservations</label>
+                        <input type="search" id="reservation-search" placeholder="Search by Patient Name, CR Number or Bag Number..." class="block w-full rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 p-3 border">
+                    </div>
+                    <div><button type="button" onclick="displayReservations()" class="w-full bg-sky-500 hover:bg-sky-600 text-white font-bold py-3 px-4 rounded-lg shadow-md transition">Search / Refresh</button></div>
+                </div>
+
+                <div class="reservation-table-container">
+                    <table class="reservation-table" id="reservationTable">
+                        <thead>
+                            <tr>
+                                <th>Patient Name</th>
+                                <th>CR Number</th>
+                                <th>Group</th>
+                                <th>Reserved Units</th>
+                                <th>Reservation Till</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td colspan="7" class="text-center text-gray-500 py-6">No reservations found.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="text-sm text-gray-500">Reservations are automatically deleted 2 days after the reservation till date.</p>
+            </div>
+
+            <div id="content-5" class="tab-content hidden">
                 <h2 class="text-2xl font-semibold text-gray-800 mb-6 border-b pb-2">Archive (Previous Reports)</h2>
                  <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                     <div class="md:col-span-3">
@@ -843,39 +853,6 @@
                         </table>
                     </div>
                 </div>
-            </div>
-
-            <div id="content-5" class="tab-content hidden">
-                <!-- Content for Tab 5: Reservations -->
-                <h2 class="text-2xl font-semibold text-gray-800 mb-6 border-b pb-2">Reservations</h2>
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                    <div class="md:col-span-3">
-                        <label for="reservation-search" class="sr-only">Search Reservations</label>
-                        <input type="search" id="reservation-search" placeholder="Search by Patient Name, CR Number or Bag Number..." class="block w-full rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 p-3 border">
-                    </div>
-                    <div><button type="button" onclick="displayReservations()" class="w-full bg-sky-500 hover:bg-sky-600 text-white font-bold py-3 px-4 rounded-lg shadow-md transition">Search / Refresh</button></div>
-                </div>
-
-                <div class="reservation-table-container">
-                    <table class="reservation-table" id="reservationTable">
-                        <thead>
-                            <tr>
-                                <th>Patient Name</th>
-                                <th>CR Number</th>
-                                <th>Group</th>
-                                <!-- MODIFIED: Header text -->
-                                <th>Reserved Units</th>
-                                <th>Reservation Till</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr><td colspan="7" class="text-center text-gray-500 py-6">No reservations found.</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-                <p class="text-sm text-gray-500">Reservations are automatically deleted 2 days after the reservation till date.</p>
             </div>
         </main>
     </div>
@@ -955,7 +932,7 @@ archive.forEach(a => { // Also add to archive for consistency
 
         // --- TAB SWITCHING ---
         const activeClass='bg-sky-500 text-white shadow-lg';const inactiveClass='text-gray-600 hover:bg-sky-100/70 bg-white';
-        function switchTab(idx){document.querySelectorAll('.tab-content').forEach(c=>c.classList.add('hidden'));document.querySelectorAll('.tab-btn').forEach(b=>{b.classList.remove(...activeClass.split(' '));b.classList.add(...inactiveClass.split(' '));b.setAttribute('aria-selected','false');});const c=d(`content-${idx}`);if(c)c.classList.remove('hidden');const b=d(`tab-${idx}`);if(b){b.classList.remove(...inactiveClass.split(' '));b.classList.add(...activeClass.split(' '));b.setAttribute('aria-selected','true');}if(idx===1){displayCompatibleUnits();autoSetCrossmatchNumber();}if(idx===2)displayPendingRegistrations();if(idx===3)refreshAllStockUI(bloodStock,window.location.hash==='#public');if(idx===4)displayArchive();if(idx===5)displayReservations();}
+        function switchTab(idx){document.querySelectorAll('.tab-content').forEach(c=>c.classList.add('hidden'));document.querySelectorAll('.tab-btn').forEach(b=>{b.classList.remove(...activeClass.split(' '));b.classList.add(...inactiveClass.split(' '));b.setAttribute('aria-selected','false');});const c=d(`content-${idx}`);if(c)c.classList.remove('hidden');const b=d(`tab-${idx}`);if(b){b.classList.remove(...inactiveClass.split(' '));b.classList.add(...activeClass.split(' '));b.setAttribute('aria-selected','true');}if(idx===1){displayCompatibleUnits();autoSetCrossmatchNumber();}if(idx===2)displayPendingRegistrations();if(idx===3)refreshAllStockUI(bloodStock,window.location.hash==='#public');if(idx===4)displayReservations();if(idx===5)displayArchive();}
 
         // --- TAB 1: REGISTRATION & ALLOTMENT ---
         let nextCrossMatchNumber=NaN; let selectedUnitsForCurrentPatient=[];
@@ -1040,16 +1017,22 @@ archive.forEach(a => { // Also add to archive for consistency
         
         // --- START OF MODIFIED FUNCTION ---
         function displayCompatibleUnits(){
-            // --- First, build a map of how many times each bag is allotted ---
+            // --- MODIFIED: Build a map of how many times each bag is allotted, IGNORING cancelled from BOTH lists ---
             const allotmentCounts = new Map();
-            [...registrations, ...archive].forEach(reg => {
-                (reg.allottedUnits || []).forEach(unit => {
-                    if (unit.bagNumber) {
-                        const count = allotmentCounts.get(unit.bagNumber) || 0;
-                        allotmentCounts.set(unit.bagNumber, count + 1);
-                    }
-                });
+            const allRecords = [...registrations, ...archive];
+
+            allRecords.forEach(reg => {
+                // ONLY count if NOT cancelled
+                if (reg.status !== 'cancelled_reservation' && reg.status !== 'cancelled') {
+                    (reg.allottedUnits || []).forEach(unit => {
+                        if (unit.bagNumber) {
+                            const count = allotmentCounts.get(unit.bagNumber) || 0;
+                            allotmentCounts.set(unit.bagNumber, count + 1);
+                        }
+                    });
+                }
             });
+            // --- END OF MODIFICATION ---
 
             const pg=d('patientBG_reg').value;
             const cg=getCompatibleGroups(pg);
@@ -1061,9 +1044,6 @@ archive.forEach(a => { // Also add to archive for consistency
             }
             const selIds=selectedUnitsForCurrentPatient.map(u=>u.id);
             
-            // --- MODIFIED: Filter logic ---
-            // This filter now only includes bags that are "ready" (isCrossmatchReady === true)
-            // AND have an allotment count less than 3 (green, yellow, or orange dots).
             const stock = bloodStock.filter(b => {
                 const count = allotmentCounts.get(b.bagNumber) || 0;
                 return b.group === pg &&              // Is exact group match
@@ -1081,7 +1061,6 @@ archive.forEach(a => { // Also add to archive for consistency
             stock.forEach(b=>{
                 const r=body.insertRow();
                 
-                // --- Dot Logic (unchanged, but will only show green/yellow/orange) ---
                 const count = allotmentCounts.get(b.bagNumber) || 0;
                 let dotHtml = '';
                 if (count === 0) {
@@ -1091,15 +1070,9 @@ archive.forEach(a => { // Also add to archive for consistency
                 } else if (count === 2) {
                     dotHtml = '<span class="status-dot dot-orange" title="Allotted 2 times"></span>';
                 }
-                // Red dot case (count >= 3) is filtered out by the 'stock' filter above
 
-                // --- MODIFIED: Action button logic ---
-                // Since the filter only allows bags where `isCrossmatchReady` is true,
-                // we no longer need the 'if/else' check for the "Make Ready" button.
-                // We only create the "Select" button.
                 let actionHtml = `<button type="button" class="action-btn btn-select-unit" data-bag-id="${b.id}">Select</button>`;
                 
-                // --- Updated row HTML with single dot ---
                 r.innerHTML=`
                     <td class="font-medium">${dotHtml}${b.bagNumber}</td>
                     <td>${b.group}</td>
@@ -1109,14 +1082,10 @@ archive.forEach(a => { // Also add to archive for consistency
                 `;
             });
             
-            // Attach "Select" button handlers
             body.querySelectorAll('.btn-select-unit').forEach(btn=>btn.onclick=(e)=>{ 
                 const bagId = (e.currentTarget||e.target).dataset.bagId; 
                 selectUnitForCurrentPatient(bagId); 
             });
-            
-            // --- MODIFIED: Removed the event listener attachment for ".btn-make-ready" ---
-            // (It no longer exists in this table)
         }
         // --- END OF MODIFIED FUNCTION ---
 
@@ -1125,19 +1094,19 @@ archive.forEach(a => { // Also add to archive for consistency
         function renderSelectedUnitsForCurrentPatient(){const bd=d('selectedUnitsTable').querySelector('tbody');bd.innerHTML='';if(selectedUnitsForCurrentPatient.length===0){bd.innerHTML='<tr><td colspan="3" class="text-center text-gray-500 py-6">No units selected.</td></tr>';return;}selectedUnitsForCurrentPatient.forEach(b=>{const r=bd.insertRow();r.innerHTML=`<td class="font-bold">${b.assignedCrossMatch}</td><td class="font-medium">${b.bagNumber}</td><td><button type="button" class="action-btn btn-remove-unit" data-bag-id="${b.id}">Remove</button></td>`;});bd.querySelectorAll('.btn-remove-unit').forEach(btn=>btn.onclick=(e)=>{ const bagId = (e.currentTarget||e.target).dataset.bagId; removeUnitForCurrentPatient(bagId); });}
         
         // --- NEW: Function to toggle bag to crossmatch-ready ---
-function makeBagReady(id) {
-    const bag = bloodStock.find(b => b.id === id);
-    if (bag) {
-        bag.isCrossmatchReady = true;
-        saveBloodStockLocal();
-        // Refresh the matrix to show the button change
-        refreshAllStockUI(bloodStock, false); 
-        // Refresh the dropdown if it's open
-        if (!d('content-1').classList.contains('hidden')) {
-            displayCompatibleUnits();
+        function makeBagReady(id) {
+            const bag = bloodStock.find(b => b.id === id);
+            if (bag) {
+                bag.isCrossmatchReady = true;
+                saveBloodStockLocal();
+                // Refresh the matrix to show the button change
+                refreshAllStockUI(bloodStock, false); 
+                // Refresh the dropdown if it's open
+                if (!d('content-1').classList.contains('hidden')) {
+                    displayCompatibleUnits();
+                }
+            }
         }
-    }
-}
 
        // NEW: Function to get reservation date (manual or default)
         function getReservationDate() {
@@ -1151,6 +1120,63 @@ function makeBagReady(id) {
             return defaultDate.toISOString().split('T')[0];
         }
         
+function loadRegistrationForEdit(id) {
+            // Find the index of the registration
+            const regIndex = registrations.findIndex(r => r.id === id);
+            if (regIndex === -1) {
+                showCustomMessage("Error: Registration not found.");
+                return;
+            }
+
+            // Get a copy of the registration data
+            const reg = { ...registrations[regIndex] };
+            const pd = reg.patientDetails;
+            
+            // Ask for confirmation
+            if (!confirm(`This will remove the pending registration for ${pd.name} (CR: ${pd.crNumber}) and load its data back into Tab 1 for editing.\n\nAre you sure you want to proceed?`)) {
+                return;
+            }
+
+            // 1. Remove the old registration
+            registrations.splice(regIndex, 1);
+            saveRegistrationsLocal();
+            displayPendingRegistrations(); // Refresh the list in Tab 2
+
+            // 2. Populate Tab 1 form
+            d('patientName_reg').value = pd.name || '';
+            d('patientAge_reg').value = pd.age || '';
+            d('patientGender_reg').value = pd.gender || '';
+            d('patientCR_reg').value = pd.crNumber || '';
+            d('patientBG_reg').value = pd.bloodGroup || '';
+            d('patientWard_reg').value = pd.ward || '';
+            d('reservationDate_reg').value = reg.reservationDate || ''; // Load reservation date
+            d('patientSearch_reg').value = '';
+            d('patientSuggestionList').innerHTML = '';
+            
+            // 3. Populate selected units
+            selectedUnitsForCurrentPatient = [...reg.allottedUnits];
+            
+            // 4. Set the crossmatch number
+            // Find the highest crossmatch number from the selected units
+            let highestCM = 0;
+            if (selectedUnitsForCurrentPatient.length > 0) {
+                highestCM = Math.max(...selectedUnitsForCurrentPatient.map(u => u.assignedCrossMatch));
+                nextCrossMatchNumber = highestCM + 1;
+            } else {
+                // If no units (shouldn't happen, but as a fallback)
+                nextCrossMatchNumber = getNextCrossmatchNumber();
+            }
+            d('crossMatchStart_reg').value = nextCrossMatchNumber;
+            
+            // 5. Switch to Tab 1
+            switchTab(1);
+            
+            // --- ADD THIS NEW BLOCK ---
+                        
+         // 6. Render the selected units (must be after switchTab(1) which calls displayCompatibleUnits)
+            renderSelectedUnitsForCurrentPatient();
+            displayCompatibleUnits(); // Re-run this to update the available list
+        }
         function saveRegistration(){
             const pd={
                 name:d('patientName_reg').value.trim(),
@@ -1328,8 +1354,11 @@ function makeBagReady(id) {
                 const reportHtml = buildPrintableReportHtml(d('reportSection').innerHTML, qrSrc);
                 openPrintWindow(reportHtml);
 
-                // archive a copy but DO NOT remove the active registration so Reservations still lists it
-                archiveRegistration(reg.id, { removeSource: false });
+                // --- MODIFICATION ---
+                // DO NOT archive here. Archiving will happen when the reservation
+                // is completed (issued, deleted, or expired).
+                // archiveRegistration(reg.id, { removeSource: false }); 
+                // --- END MODIFICATION ---
             }, 150);
         }
 
@@ -1584,11 +1613,14 @@ function makeBagReady(id) {
              const filteredRegs = registrations.filter(reg => (reg.status === 'pending_crossmatch' || reg.status === 'crossmatch_ok' || reg.status === 'crossmatch ok') && (!searchTerm || reg.patientDetails.name.toLowerCase().includes(searchTerm) || reg.patientDetails.crNumber.toLowerCase().includes(searchTerm)));
              if (filteredRegs.length === 0) { tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-gray-500 py-6">No pending regs found${searchTerm ? ' matching search' : ''}.</td></tr>`; return; }
              filteredRegs.sort((a,b) => new Date(b.registrationTimestamp) - new Date(a.registrationTimestamp));
-             filteredRegs.forEach(reg => { const r = tableBody.insertRow(); r.innerHTML = `<td>${reg.patientDetails.crNumber}</td><td>${reg.patientDetails.name}</td><td>${reg.patientDetails.bloodGroup}</td><td>${reg.allottedUnits.length}</td><td class="status-${reg.status}">${reg.status.replace('_',' ')}</td><td><button type="button" class="action-btn btn-prepare-report" data-reg-id="${reg.id}">Prepare & Print</button><button type="button" class="action-btn btn-delete-registration" data-reg-id="${reg.id}">Cancel</button></td>`; });
+             filteredRegs.forEach(reg => { const r = tableBody.insertRow(); r.innerHTML = `<td>${reg.patientDetails.crNumber}</td><td>${reg.patientDetails.name}</td><td>${reg.patientDetails.bloodGroup}</td><td>${reg.allottedUnits.length}</td><td class="status-${reg.status}">${reg.status.replace('_',' ')}</td><td><button type="button" class="action-btn btn-edit-registration" data-reg-id="${reg.id}">Edit</button><button type="button" class="action-btn btn-prepare-report" data-reg-id="${reg.id}">Prepare & Print</button><button type="button" class="action-btn btn-delete-registration" data-reg-id="${reg.id}">Cancel</button></td>`; });
+             
+             // --- ALL LISTENERS MUST BE INSIDE THE FUNCTION ---
              tableBody.querySelectorAll('.btn-prepare-report').forEach(btn => btn.onclick = (e) => prepareReportForPatient((e.currentTarget||e.target).dataset.regId, true));
              tableBody.querySelectorAll('.btn-delete-registration').forEach(btn => btn.onclick = (e) => cancelRegistration((e.currentTarget||e.target).dataset.regId));
-         }
-         
+             tableBody.querySelectorAll('.btn-edit-registration').forEach(btn => btn.onclick = (e) => loadRegistrationForEdit((e.currentTarget||e.target).dataset.regId));
+         } // <-- THIS IS THE CORRECT CLOSING BRACE
+
          function cancelRegistration(id) {
              if (!confirm("Cancel registration & release units?")) return;
              const idx = registrations.findIndex(r => r.id === id); if (idx === -1) return; const reg = registrations[idx];
@@ -1822,26 +1854,38 @@ function makeBagReady(id) {
             if (!reg) return;
 
             // Skip if already archived
-            if (archive.find(a => a.id === registrationId)) return;
+            if (archive.find(a => a.id === registrationId)) {
+                // If we are trying to archive something already archived, just ensure it's removed from the active list
+                if (options.removeSource === true) {
+                    const idx = registrations.findIndex(r => r.id === registrationId);
+                    if (idx !== -1) {
+                        registrations.splice(idx, 1);
+                        saveRegistrationsLocal();
+                    }
+                }
+                return;
+            }
 
             const archivedRecord = {
                 ...reg,
                 archivedTimestamp: new Date().toISOString(),
-                archiveStatus: 'completed'
+                archiveStatus: reg.status === 'cancelled_reservation' ? 'cancelled' : 'completed'
             };
 
             archive.push(archivedRecord);
             saveArchiveLocal();
             buildPatientMap(); // NEW: Update patient map
 
-            // Remove source only when explicitly requested AND when crossmatch completed
-            if (options.removeSource === true && (reg.status === 'crossmatch_ok' || reg.status === 'crossmatch ok')) {
+            // --- MODIFICATION ---
+            // Remove source only when explicitly requested, regardless of status
+            if (options.removeSource === true) {
                 const idx = registrations.findIndex(r => r.id === registrationId);
                 if (idx !== -1) {
                     registrations.splice(idx, 1);
                     saveRegistrationsLocal();
                 }
             }
+            // --- END MODIFICATION ---
 
             cleanupOldArchive();
         }
@@ -1979,200 +2023,212 @@ function makeBagReady(id) {
         
         // --- NEW renderAdminMatrix (from index.html) ---
         function renderAdminMatrix(stock) {
-    // --- NEW: Build allotment count map ---
-    const allotmentCounts = new Map();
-    [...registrations, ...archive].forEach(reg => {
-        (reg.allottedUnits || []).forEach(unit => {
-            if (unit.bagNumber) {
-                const count = allotmentCounts.get(unit.bagNumber) || 0;
-                allotmentCounts.set(unit.bagNumber, count + 1);
-            }
-        });
-    });
-    // --- END ---
+            // --- MODIFIED: Build allotment count map, IGNORING cancelled registrations from BOTH lists ---
+            const allotmentCounts = new Map();
+            const allRecords = [...registrations, ...archive];
 
-    const container = d('screenMatrixTable');
-    if (!container) return;
-    container.innerHTML = `
-        <thead>
-            <tr>
-                <th colspan="4" class="group-header matrix-thick-left">A+</th>
-                <th colspan="4" class="group-header matrix-thick-left">B+</th>
-                <th colspan="4" class="group-header matrix-thick-left">O+</th>
-                <th colspan="4" class="group-header matrix-thick-left matrix-thick-right">AB+</th>
-            </tr>
-            <tr>
-                <th class="sub-header matrix-thick-left">Bag No.</th><th class="sub-header">Collection</th><th class="sub-header">Expiry</th><th class="sub-header">Vol.</th>
-                <th class="sub-header matrix-thick-left">Bag No.</th><th class="sub-header">Collection</th><th class="sub-header">Expiry</th><th class="sub-header">Vol.</th>
-                <th class="sub-header matrix-thick-left">Bag No.</th><th class="sub-header">Collection</th><th class="sub-header">Expiry</th><th class="sub-header">Vol.</th>
-                <th class="sub-header matrix-thick-left">Bag No.</th><th class="sub-header">Collection</th><th class="sub-header">Expiry</th><th class="sub-header matrix-thick-right">Vol.</th>
-            </tr>
-        </thead>
-        <tbody id="screenMatrixBodyPos"></tbody>
-        <thead>
-            <tr>
-                <th colspan="4" class="group-header matrix-thick-left">A-</th>
-                <th colspan="4" class="group-header matrix-thick-left">B-</th>
-                <th colspan="4" class="group-header matrix-thick-left">O-</th>
-                <th colspan="4" class="group-header matrix-thick-left matrix-thick-right">AB-</th>
-            </tr>
-            <tr>
-                <th class="sub-header matrix-thick-left">Bag No.</th><th class="sub-header">Collection</th><th class="sub-header">Expiry</th><th class="sub-header">Vol.</th>
-                <th class="sub-header matrix-thick-left">Bag No.</th><th class="sub-header">Collection</th><th class="sub-header">Expiry</th><th class="sub-header">Vol.</th>
-                <th class="sub-header matrix-thick-left">Bag No.</th><th class="sub-header">Collection</th><th class="sub-header">Expiry</th><th class="sub-header">Vol.</th>
-                <th class="sub-header matrix-thick-left">Bag No.</th><th class="sub-header">Collection</th><th class="sub-header">Expiry</th><th class="sub-header matrix-thick-right">Vol.</th>
-            </tr>
-        </thead>
-        <tbody id="screenMatrixBodyNeg"></tbody>
-    `;
-    const pos = ["A+","B+","O+","AB+"], neg = ["A-","B-","O-","AB-"];
-    let byPos={},byNeg={};pos.forEach(g=>byPos[g]=[]);neg.forEach(g=>byNeg[g]=[]);
-    stock.forEach(b=>{ if(byPos[b.group])byPos[b.group].push(b); if(byNeg[b.group])byNeg[b.group].push(b); });
-    for(let g of pos)byPos[g].sort((a,b)=>new Date(a.collectionDate)-new Date(b.collectionDate));
-    for(let g of neg)byNeg[g].sort((a,b)=>new Date(a.collectionDate)-new Date(b.collectionDate));
-    const pmax=Math.max(...pos.map(g=>byPos[g].length)), nmax=Math.max(...neg.map(g=>byNeg[g].length));
-    const mbp=d('screenMatrixBodyPos'),mbn=d('screenMatrixBodyNeg');
-
-    for(let i=0;i<pmax;++i){
-        const row=document.createElement('tr');
-        pos.forEach((g, ki) => {
-            const b = byPos[g][i];
-            for (let k = 0; k < 4; ++k) {
-                let td = document.createElement('td');
-                if (k === 0) td.className += 'matrix-thick-left ';
-                if (ki === pos.length - 1 && k === 3) td.className += 'matrix-thick-right ';
-                if (b) {
-                    if (k == 0) {
-                        // --- NEW: Single Dot Logic ---
-                        const count = allotmentCounts.get(b.bagNumber) || 0;
-                        let dotHtml = '';
-                        if (b.isCrossmatchReady) {
-                            if (count === 0) {
-                                dotHtml = '<span class="status-dot dot-green" title="Ready for Crossmatch"></span>';
-                            } else if (count === 1) {
-                                dotHtml = '<span class="status-dot dot-yellow" title="Allotted 1 time"></span>';
-                            } else if (count === 2) {
-                                dotHtml = '<span class="status-dot dot-orange" title="Allotted 2 times"></span>';
-                            } else if (count >= 3) {
-                                dotHtml = '<span class="status-dot dot-red" title="Allotted 3+ times"></span>';
-                            }
+            allRecords.forEach(reg => {
+                // ONLY count if NOT cancelled
+                if (reg.status !== 'cancelled_reservation' && reg.status !== 'cancelled') {
+                    (reg.allottedUnits || []).forEach(unit => {
+                        if (unit.bagNumber) {
+                            const count = allotmentCounts.get(unit.bagNumber) || 0;
+                            allotmentCounts.set(unit.bagNumber, count + 1);
                         }
-                        
-                        td.innerHTML = dotHtml; // Add dot
-                        td.appendChild(document.createTextNode(b.bagNumber + ' ')); // Add bag number
-
-                        // --- Existing "Remove" button ---
-                        const btn = document.createElement('button'); 
-                        btn.textContent = "X"; 
-                        btn.className = "action-btn-matrix remove-btn-matrix"; 
-                        btn.onclick = () => deleteBag(b.id); 
-                        td.appendChild(btn); 
-
-                        // --- "Make Ready" button ---
-                        if (!b.isCrossmatchReady) {
-                            const readyBtn = document.createElement('button');
-                            readyBtn.textContent = "✔"; // Checkmark
-                            readyBtn.className = "action-btn-matrix ready-btn-matrix"; 
-                            readyBtn.onclick = () => makeBagReady(b.id);
-                            td.appendChild(readyBtn);
-                        }
-                    }
-                    else if (k == 1) td.textContent = ddmmyy(b.collectionDate);
-                    else if (k == 2) td.textContent = ddmmyy(b.expiryDate);
-                    else if (k == 3) td.textContent = b.volume;
-                } else {
-                    td.innerHTML = '&nbsp;';
+                    });
                 }
-                row.appendChild(td);
-            }
-        });
-        mbp.appendChild(row);
-    }
-    if (pmax === 0) {
-         const row=document.createElement('tr');
-         pos.forEach((g, ki) => {
-             for (let k = 0; k < 4; ++k) {
-                let td = document.createElement('td');
-                if (k === 0) td.className += 'matrix-thick-left ';
-                if (ki === pos.length - 1 && k === 3) td.className += 'matrix-thick-right ';
-                td.innerHTML = '&nbsp;';
-                row.appendChild(td);
-             }
-         });
-         mbp.appendChild(row);
-    }
+            });
+            // --- END OF MODIFICATION ---
 
-    for(let i=0;i<nmax;++i){
-        const row=document.createElement('tr');
-        neg.forEach((g, ki) => {
-            const b = byNeg[g][i];
-            for (let k = 0; k < 4; ++k) {
-            let td = document.createElement('td');
-            if (k < 3) td.style.fontSize = '0.82rem'; // Apply smaller font to Bag, Collection, Expiry cells
-                if (k === 0) td.className += 'matrix-thick-left ';
-                if (ki === neg.length - 1 && k === 3) td.className += 'matrix-thick-right ';
-                if (b) {
-                    if (k == 0) {
-                        // --- NEW: Single Dot Logic ---
-                        const count = allotmentCounts.get(b.bagNumber) || 0;
-                        let dotHtml = '';
-                        if (b.isCrossmatchReady) {
-                            if (count === 0) {
-                                dotHtml = '<span class="status-dot dot-green" title="Ready for Crossmatch"></span>';
-                            } else if (count === 1) {
-                                dotHtml = '<span class="status-dot dot-yellow" title="Allotted 1 time"></span>';
-                            } else if (count === 2) {
-                                dotHtml = '<span class="status-dot dot-orange" title="Allotted 2 times"></span>';
-                            } else if (count >= 3) {
-                                dotHtml = '<span class="status-dot dot-red" title="Allotted 3+ times"></span>';
-                            }
+            const container = d('screenMatrixTable');
+            if (!container) return;
+            container.innerHTML = `
+                <thead>
+                    <tr>
+                        <th colspan="4" class="group-header matrix-thick-left">A+</th>
+                        <th colspan="4" class="group-header matrix-thick-left">B+</th>
+                        <th colspan="4" class="group-header matrix-thick-left">O+</th>
+                        <th colspan="4" class="group-header matrix-thick-left matrix-thick-right">AB+</th>
+                    </tr>
+                    <tr>
+                        <th class="sub-header matrix-thick-left">Bag No.</th><th class="sub-header">Collection</th><th class="sub-header">Expiry</th><th class="sub-header">Vol.</th>
+                        <th class="sub-header matrix-thick-left">Bag No.</th><th class="sub-header">Collection</th><th class="sub-header">Expiry</th><th class="sub-header">Vol.</th>
+                        <th class="sub-header matrix-thick-left">Bag No.</th><th class="sub-header">Collection</th><th class="sub-header">Expiry</th><th class="sub-header">Vol.</th>
+                        <th class="sub-header matrix-thick-left">Bag No.</th><th class="sub-header">Collection</th><th class="sub-header">Expiry</th><th class="sub-header matrix-thick-right">Vol.</th>
+                    </tr>
+                </thead>
+                <tbody id="screenMatrixBodyPos"></tbody>
+                <thead>
+                    <tr>
+                        <th colspan="4" class="group-header matrix-thick-left">A-</th>
+                        <th colspan="4" class="group-header matrix-thick-left">B-</th>
+                        <th colspan="4" class="group-header matrix-thick-left">O-</th>
+                        <th colspan="4" class="group-header matrix-thick-left matrix-thick-right">AB-</th>
+                    </tr>
+                    <tr>
+                        <th class="sub-header matrix-thick-left">Bag No.</th><th class="sub-header">Collection</th><th class="sub-header">Expiry</th><th class="sub-header">Vol.</th>
+                        <th class="sub-header matrix-thick-left">Bag No.</th><th class="sub-header">Collection</th><th class="sub-header">Expiry</th><th class="sub-header">Vol.</th>
+                        <th class="sub-header matrix-thick-left">Bag No.</th><th class="sub-header">Collection</th><th class="sub-header">Expiry</th><th class="sub-header">Vol.</th>
+                        <th class="sub-header matrix-thick-left">Bag No.</th><th class="sub-header">Collection</th><th class="sub-header">Expiry</th><th class="sub-header matrix-thick-right">Vol.</th>
+                    </tr>
+                </thead>
+                <tbody id="screenMatrixBodyNeg"></tbody>
+            `;
+            const pos = ["A+","B+","O+","AB+"], neg = ["A-","B-","O-","AB-"];
+            let byPos={},byNeg={};pos.forEach(g=>byPos[g]=[]);neg.forEach(g=>byNeg[g]=[]);
+            stock.forEach(b=>{ if(byPos[b.group])byPos[b.group].push(b); if(byNeg[b.group])byNeg[b.group].push(b); });
+            for(let g of pos)byPos[g].sort((a,b)=>new Date(a.collectionDate)-new Date(b.collectionDate));
+            for(let g of neg)byNeg[g].sort((a,b)=>new Date(a.collectionDate)-new Date(b.collectionDate));
+            const pmax=Math.max(...pos.map(g=>byPos[g].length)), nmax=Math.max(...neg.map(g=>byNeg[g].length));
+            const mbp=d('screenMatrixBodyPos'),mbn=d('screenMatrixBodyNeg');
+
+            for(let i=0;i<pmax;++i){
+                const row=document.createElement('tr');
+                pos.forEach((g, ki) => {
+                    const b = byPos[g][i];
+                    for (let k = 0; k < 4; ++k) {
+                        let td = document.createElement('td');
+                        if (k === 0) td.className += 'matrix-thick-left ';
+                        if (ki === pos.length - 1 && k === 3) td.className += 'matrix-thick-right ';
+                        if (b) {
+                            if (k == 0) {
+                                // --- Single Dot Logic ---
+                                const count = allotmentCounts.get(b.bagNumber) || 0;
+                                let dotHtml = '';
+                                if (b.isCrossmatchReady) {
+                                    if (count === 0) {
+                                        dotHtml = '<span class="status-dot dot-green" title="Ready for Crossmatch"></span>';
+                                    } else if (count === 1) {
+                                        dotHtml = '<span class="status-dot dot-yellow" title="Allotted 1 time"></span>';
+                                    } else if (count === 2) {
+                                        dotHtml = '<span class="status-dot dot-orange" title="Allotted 2 times"></span>';
+                                    } else if (count >= 3) {
+                                        dotHtml = '<span class="status-dot dot-red" title="Allotted 3+ times"></span>';
+                                    }
+                                }
+                                
+                                td.innerHTML = dotHtml; // Add dot
+
+                                // --- MOVED: Padlock button now comes FIRST ---
+                                if (!b.isCrossmatchReady) {
+                                    const readyBtn = document.createElement('button');
+                                    readyBtn.textContent = "🔒"; // Padlock
+                                    readyBtn.className = "action-btn-matrix ready-btn-matrix"; 
+                                    readyBtn.onclick = () => {
+                                        if (confirm(`Make bag ${b.bagNumber} ready for crossmatch?`)) {
+                                            makeBagReady(b.id);
+                                        }
+                                    };
+                                    td.appendChild(readyBtn);
+                                }
+                                // --- END MOVED BLOCK ---
+
+                                td.appendChild(document.createTextNode(b.bagNumber + ' ')); // Add bag number
+
+                                const btn = document.createElement('button'); 
+                                btn.textContent = "X"; 
+                                btn.className = "action-btn-matrix remove-btn-matrix"; 
+                                btn.onclick = () => deleteBag(b.id); 
+                                td.appendChild(btn);                            }
+                            else if (k == 1) td.textContent = ddmmyy(b.collectionDate);
+                            else if (k == 2) td.textContent = ddmmyy(b.expiryDate);
+                            else if (k == 3) td.textContent = b.volume;
+                        } else {
+                            td.innerHTML = '&nbsp;';
                         }
-                        
-                        td.innerHTML = dotHtml; // Add dot
-                        td.appendChild(document.createTextNode(b.bagNumber + ' ')); // Add bag number
-
-                        // --- Existing "Remove" button ---
-                        const btn = document.createElement('button'); 
-                        btn.textContent = "X"; 
-                        btn.className = "action-btn-matrix remove-btn-matrix"; 
-                        btn.onclick = () => deleteBag(b.id); 
-                        td.appendChild(btn); 
-
-                        // --- "Make Ready" button ---
-                        if (!b.isCrossmatchReady) {
-                            const readyBtn = document.createElement('button');
-                            readyBtn.textContent = "✔"; // Checkmark
-                            readyBtn.className = "action-btn-matrix ready-btn-matrix"; 
-                            readyBtn.onclick = () => makeBagReady(b.id);
-                            td.appendChild(readyBtn);
-                        }
+                        row.appendChild(td);
                     }
-                    else if (k == 1) td.textContent = ddmmyy(b.collectionDate);
-                    else if (k == 2) td.textContent = ddmmyy(b.expiryDate);
-                    else if (k == 3) td.textContent = b.volume;
-                } else {
-                     td.innerHTML = '&nbsp;';
-                }
-                row.appendChild(td);
+                });
+                mbp.appendChild(row);
             }
-        });
-        mbn.appendChild(row);
-    }
-     if (nmax === 0) {
-         const row=document.createElement('tr');
-         neg.forEach((g, ki) => {
-             for (let k = g; k < 4; ++k) {
-                let td = document.createElement('td');
-                if (k === 0) td.className += 'matrix-thick-left ';
-                if (ki === neg.length - 1 && k === 3) td.className += 'matrix-thick-right ';
-                td.innerHTML = '&nbsp;';
-                row.appendChild(td);
-             }
-         });
-         mbn.appendChild(row);
-    }
-}
+            if (pmax === 0) {
+                const row=document.createElement('tr');
+                pos.forEach((g, ki) => {
+                    for (let k = 0; k < 4; ++k) {
+                        let td = document.createElement('td');
+                        if (k === 0) td.className += 'matrix-thick-left ';
+                        if (ki === pos.length - 1 && k === 3) td.className += 'matrix-thick-right ';
+                        td.innerHTML = '&nbsp;';
+                        row.appendChild(td);
+                    }
+                });
+                mbp.appendChild(row);
+            }
 
+            for(let i=0;i<nmax;++i){
+                const row=document.createElement('tr');
+                neg.forEach((g, ki) => {
+                    const b = byNeg[g][i];
+                    for (let k = 0; k < 4; ++k) {
+                    let td = document.createElement('td');
+                    if (k < 3) td.style.fontSize = '0.82rem'; // Apply smaller font to Bag, Collection, Expiry cells
+                        if (k === 0) td.className += 'matrix-thick-left ';
+                        if (ki === neg.length - 1 && k === 3) td.className += 'matrix-thick-right ';
+                        if (b) {
+                            if (k == 0) {
+                                // --- Single Dot Logic ---
+                                const count = allotmentCounts.get(b.bagNumber) || 0;
+                                let dotHtml = '';
+                                if (b.isCrossmatchReady) {
+                                    if (count === 0) {
+                                        dotHtml = '<span class="status-dot dot-green" title="Ready for Crossmatch"></span>';
+                                    } else if (count === 1) {
+                                        dotHtml = '<span class="status-dot dot-yellow" title="Allotted 1 time"></span>';
+                                    } else if (count === 2) {
+                                        dotHtml = '<span class="status-dot dot-orange" title="Allotted 2 times"></span>';
+                                    } else if (count >= 3) {
+                                        dotHtml = '<span class="status-dot dot-red" title="Allotted 3+ times"></span>';
+                                    }
+                                }
+                                
+                                td.innerHTML = dotHtml; // Add dot
+
+                                // --- MOVED: Padlock button now comes FIRST ---
+                                if (!b.isCrossmatchReady) {
+                                    const readyBtn = document.createElement('button');
+                                    readyBtn.textContent = "🔒"; // Padlock
+                                    readyBtn.className = "action-btn-matrix ready-btn-matrix"; 
+                                    readyBtn.onclick = () => {
+                                        if (confirm(`Make bag ${b.bagNumber} ready for crossmatch?`)) {
+                                            makeBagReady(b.id);
+                                        }
+                                    };
+                                    td.appendChild(readyBtn);
+                                }
+                                // --- END MOVED BLOCK ---
+
+                                td.appendChild(document.createTextNode(b.bagNumber + ' ')); // Add bag number
+
+                                const btn = document.createElement('button'); 
+                                btn.textContent = "X"; 
+                                btn.className = "action-btn-matrix remove-btn-matrix"; 
+                                btn.onclick = () => deleteBag(b.id); 
+                                td.appendChild(btn);                            }
+                            else if (k == 1) td.textContent = ddmmyy(b.collectionDate);
+                            else if (k == 2) td.textContent = ddmmyy(b.expiryDate);
+                            else if (k == 3) td.textContent = b.volume;
+                        } else {
+                            td.innerHTML = '&nbsp;';
+                        }
+                        row.appendChild(td);
+                    }
+                });
+                mbn.appendChild(row);
+            }
+            if (nmax === 0) {
+                const row=document.createElement('tr');
+                neg.forEach((g, ki) => {
+                    for (let k = g; k < 4; ++k) {
+                        let td = document.createElement('td');
+                        if (k === 0) td.className += 'matrix-thick-left ';
+                        if (ki === neg.length - 1 && k === 3) td.className += 'matrix-thick-right ';
+                        td.innerHTML = '&nbsp;';
+                        row.appendChild(td);
+                    }
+                });
+                mbn.appendChild(row);
+            }
+        }
         // --- NEW renderPublicMatrix (from index.html) ---
         function renderPublicMatrix(stock) { 
             const container = d('publicMatrixTable');
@@ -2388,15 +2444,19 @@ function makeBagReady(id) {
 	   // --- End of new logic ---
             reg.allottedUnits.splice(bagIndex, 1);
             
-            // If last bag is issued, remove the entire registration
+            // --- MODIFICATION ---
+            // If last bag is issued, ARCHIVE and remove the entire registration
             if (reg.allottedUnits.length === 0) {
-                registrations.splice(regIndex, 1);
-                showCustomMessage(`Bag ${bagNumber} issued. This was the last unit; reservation for ${reg.patientDetails.name} has been removed.`);
+                // Archive it first
+                archiveRegistration(reg.id, { removeSource: true }); // removeSource: true will splice it from 'registrations'
+                
+                showCustomMessage(`Bag ${bagNumber} issued. This was the last unit; reservation for ${reg.patientDetails.name} has been completed and archived.`);
             } else {
                 showCustomMessage(`Bag ${bagNumber} issued. ${reg.allottedUnits.length} unit(s) remaining for ${reg.patientDetails.name}.`);
+                saveRegistrationsLocal(); // Save the change to allottedUnits
             }
+            // --- END MODIFICATION ---
             
-            saveRegistrationsLocal();
             refreshAllStockUI(bloodStock, window.location.hash === '#public'); // <-- ADD THIS LINE
             displayReservations(); // Refresh the reservation list
         }
@@ -2435,20 +2495,28 @@ function makeBagReady(id) {
             if (!newDate || isNaN(new Date(newDate).getTime())) { showCustomMessage("Enter valid reservation till date."); return; }
 
             reg.reservationDate = newDate;
+            
+            // --- MODIFICATION ---
             if (newStatus === 'cancelled') {
-                // release units and mark cancelled
+                // release units, mark cancelled, AND archive it
                 reg.status = 'cancelled_reservation';
                 (reg.allottedUnits || []).forEach(u => {
                     const s = bloodStock.find(b => b.id === u.id);
-                    if (s) s.status = 'available';
+                    if (s) s.status = 'available'; // This status isn't used by counter, but good practice
                 });
                 saveBloodStockLocal();
+                
+                // Archive and remove from registrations
+                archiveRegistration(reg.id, { removeSource: true });
+                // saveRegistrationsLocal() is called inside archiveRegistration
+                
             } else {
                 // reserved
                 reg.status = 'pending_crossmatch';
+                saveRegistrationsLocal(); // Save changes if NOT cancelling
             }
+            // --- END MODIFICATION ---
 
-            saveRegistrationsLocal();
             refreshAllStockUI(bloodStock, window.location.hash === '#public');
             displayReservations();
             closeReservationModal();
@@ -2456,22 +2524,30 @@ function makeBagReady(id) {
         }
 
         function deleteReservation(regId) {
-            if (!confirm("Delete reservation and release allocated units? This is permanent.")) return;
+            if (!confirm("Delete reservation and release allocated units? This will archive the report and is permanent.")) return;
             const idx = registrations.findIndex(r => r.id === regId);
             if (idx === -1) { showCustomMessage("Reservation not found."); return; }
             const reg = registrations[idx];
-            // release units
+            
+            // --- MODIFICATION ---
+            // Mark as cancelled before archiving
+            reg.status = 'cancelled_reservation';
+            
+            // Archive the record, which will also remove it from registrations
+            archiveRegistration(reg.id, { removeSource: true });
+            
+            // We still need to release units (as their status in stock is not 'cancelled')
             (reg.allottedUnits || []).forEach(u => {
                 const s = bloodStock.find(b => b.id === u.id);
                 if (s) s.status = 'available';
             });
             saveBloodStockLocal();
-            registrations.splice(idx,1);
-            saveRegistrationsLocal();
-            buildPatientMap(); // NEW: Update patient map
+            // --- END MODIFICATION ---
+
+            buildPatientMap();
             refreshAllStockUI(bloodStock, window.location.hash === '#public');
             displayReservations();
-            showCustomMessage("Reservation deleted and units released.");
+            showCustomMessage("Reservation deleted, units released, and report archived.");
         }
 
         function cleanupExpiredReservations() {
@@ -2485,23 +2561,28 @@ function makeBagReady(id) {
                 const resDate = new Date(reg.reservationDate + 'T23:59:59'); // treat as end of day
                 const expiryDate = new Date(resDate);
                 expiryDate.setDate(expiryDate.getDate() + 2);
+                
                 if (now > expiryDate) {
+                    // --- MODIFICATION ---
                     // release units
                     (reg.allottedUnits || []).forEach(u => {
                         const s = bloodStock.find(b => b.id === u.id);
                         if (s) s.status = 'available';
                     });
-                    // remove from registrations
-                    const idx = registrations.findIndex(r => r.id === reg.id);
-                    if (idx !== -1) {
-                        registrations.splice(idx,1);
-                    }
+                    
+                    // Mark as expired/cancelled
+                    reg.status = 'cancelled_reservation'; 
+                    
+                    // Archive and remove from registrations
+                    archiveRegistration(reg.id, { removeSource: true });
+                    // --- END MODIFICATION ---
+                    
                     removed++;
                 }
             });
             if (removed > 0) {
                 saveBloodStockLocal();
-                saveRegistrationsLocal();
+                // saveRegistrationsLocal(); // Now called inside archiveRegistration
                 buildPatientMap(); // NEW: Update patient map
                 refreshAllStockUI(bloodStock, window.location.hash === '#public');
                 console.log(`Auto-deleted ${removed} expired reservation(s).`);
@@ -2528,8 +2609,8 @@ function makeBagReady(id) {
         window.issueReservedBag = issueReservedBag; // NEW: Expose issue function
 
         // --- GLOBAL EXPOSURE ---
-        window.switchTab=switchTab; window.deleteBag=deleteBag; window.printStock=printStock; window.selectUnitForCurrentPatient=selectUnitForCurrentPatient; window.removeUnitForCurrentPatient=removeUnitForCurrentPatient; window.prepareReportForPatient=prepareReportForPatient; window.cancelRegistration=cancelRegistration; window.updateRegistrationStatus=updateRegistrationStatus; window.searchArchive=searchArchive; window.printArchivedReport=printArchivedReport; window.deleteArchivedRecord=deleteArchivedRecord; window.displayReservations = displayReservations; window.makeBagReady=makeBagReady;
-
+        
+        window.switchTab=switchTab; window.deleteBag=deleteBag; window.printStock=printStock; window.selectUnitForCurrentPatient=selectUnitForCurrentPatient; window.removeUnitForCurrentPatient=removeUnitForCurrentPatient; window.prepareReportForPatient=prepareReportForPatient; window.cancelRegistration=cancelRegistration; window.updateRegistrationStatus=updateRegistrationStatus; window.searchArchive=searchArchive; window.printArchivedReport=printArchivedReport; window.deleteArchivedRecord=deleteArchivedRecord; window.displayReservations = displayReservations; window.makeBagReady=makeBagReady; window.loadRegistrationForEdit=loadRegistrationForEdit;
         // --- INITIALIZATION ---
         document.addEventListener('DOMContentLoaded', () => {
              if (!firebaseConfig) { 
@@ -2537,6 +2618,13 @@ function makeBagReady(id) {
                  buildPatientMap(); // NEW: Build patient map on load
              }
             switchTab(1);
+            // This replaces the onclick="" attributes in the HTML
+            d('tab-1').addEventListener('click', () => switchTab(1));
+            d('tab-2').addEventListener('click', () => switchTab(2));
+            d('tab-3').addEventListener('click', () => switchTab(3));
+            d('tab-4').addEventListener('click', () => switchTab(4));
+            d('tab-5').addEventListener('click', () => switchTab(5));
+            // --- END OF NEW BLOCK --
             const isPublic=window.location.hash==='#public'; const adminV=d('adminView'),publicV=d('publicView'); if(adminV&&publicV){if(isPublic){adminV.style.display='none';publicV.style.display='block';}else{adminV.style.display='block';publicV.style.display='none';}} const printDEl=d('printDateStock'); if(printDEl){const t=new Date();printDEl.textContent=`Stock Date: ${t.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})}`;} const addF=d('addBagForm'); if(addF){const dI=d('collectionDate_stock');if(dI)dI.value=new Date().toISOString().slice(0,10);addF.onsubmit=function(e){e.preventDefault();const p=d('bagPrefix_stock').value,n=d('bagNumber').value.trim(),f=p+n,g=d('bloodGroup_stock').value,cd=d('collectionDate_stock').value,v=parseInt(d('volume_stock').value,10),r=d('remarks_stock').value.trim();if(n==="") {showCustomMessage("Enter Bag No.");return;}addBag(f,g,cd,v,r);d('bagNumber').value='';d('remarks_stock').value='';d('bagNumber').focus();};}
             // safe listeners
             const bgEl = d('patientBG_reg');
