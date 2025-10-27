@@ -892,23 +892,25 @@
         function parseBagNumber(fbn){const m=fbn.match(/^([CI]-)(.*)$/);if(m)return{prefix:m[1],number:m[2]};return{prefix:'C-',number:fbn};}
 
         // --- CROSSMATCH NUMBER PERSISTENCE FUNCTIONS ---
+        // NEW: Reads the next expected number *without* writing to localStorage
         function getNextCrossmatchNumber() {
             const last = localStorage.getItem(LAST_CROSSMATCH_KEY);
             if (!last) {
                 // First time - start from 501
                 const startNum = 501;
-                localStorage.setItem(LAST_CROSSMATCH_KEY, startNum.toString());
+                // Note: We do NOT write to localStorage here, only when a registration is saved
                 return startNum;
             }
             const nextNum = parseInt(last) + 1;
-            localStorage.setItem(LAST_CROSSMATCH_KEY, nextNum.toString());
             return nextNum;
         }
 
+        // UNCHANGED: Sets the last used number (only called after successful registration)
         function setLastCrossmatchNumber(num) {
             localStorage.setItem(LAST_CROSSMATCH_KEY, num.toString());
         }
 
+        // UNCHANGED: Gets the current stored number
         function getCurrentCrossmatchNumber() {
             const last = localStorage.getItem(LAST_CROSSMATCH_KEY);
             return last ? parseInt(last) : 501;
@@ -1003,13 +1005,18 @@ archive.forEach(a => { // Also add to archive for consistency
         }
 
         
-        // NEW: Auto-set crossmatch number on tab load
+        // MODIFIED: Only set the crossmatch number if the field is empty, 
+        // and always update the local variable.
         function autoSetCrossmatchNumber() {
             const nextCM = getNextCrossmatchNumber();
-            nextCrossMatchNumber = nextCM;
+            // Update the global variable that holds the current starting CM number
+            // (The global variable must track what's currently in the input field or next expected)
+            nextCrossMatchNumber = parseInt(d('crossMatchStart_reg').value) || nextCM;
+            
             const cmEl = d('crossMatchStart_reg');
-            if (cmEl) {
+            if (cmEl && !cmEl.value) { // Only set if the field is currently empty
                 cmEl.value = nextCM;
+                nextCrossMatchNumber = nextCM; // Ensure global var is updated if value was set
             }
         }
         
@@ -1089,7 +1096,43 @@ archive.forEach(a => { // Also add to archive for consistency
         }
         // --- END OF MODIFIED FUNCTION ---
 
-        function selectUnitForCurrentPatient(id){ if(isNaN(nextCrossMatchNumber)){ showCustomMessage("Set starting cross-match no."); const el = d('crossMatchStart_reg'); if(el) el.focus(); return; } const b=bloodStock.find(x=>x.id===id); if(!b) return; if(b.status && b.status!=='available'){ showCustomMessage(`Already allotted: ${b.bagNumber}`); return; } selectedUnitsForCurrentPatient.push({...b,assignedCrossMatch:nextCrossMatchNumber}); nextCrossMatchNumber++; const el = d('crossMatchStart_reg'); if(el) el.value = isNaN(nextCrossMatchNumber)?'':nextCrossMatchNumber; renderSelectedUnitsForCurrentPatient(); displayCompatibleUnits(); }
+        // MODIFIED: Ensure nextCrossMatchNumber uses the input value as its base
+        function selectUnitForCurrentPatient(id){ 
+            // Read value from input, use nextCM as fallback if input is invalid
+            const currentCM = parseInt(d('crossMatchStart_reg').value.trim(), 10) || getNextCrossmatchNumber();
+            if(isNaN(currentCM)){ 
+                showCustomMessage("Set starting cross-match no."); 
+                const el = d('crossMatchStart_reg'); 
+                if(el) el.focus(); 
+                return; 
+            } 
+            
+            const b=bloodStock.find(x=>x.id===id); 
+            if(!b) return; 
+            if(b.status && b.status!=='available'){ 
+                showCustomMessage(`Already allotted: ${b.bagNumber}`); 
+                return; 
+            } 
+            
+            // Check if it's the first selection, then use currentCM
+            let cmToUse;
+            if (selectedUnitsForCurrentPatient.length === 0) {
+                cmToUse = currentCM;
+            } else {
+                // Otherwise, use the global variable which was incremented on the last selection
+                cmToUse = nextCrossMatchNumber;
+            }
+
+            selectedUnitsForCurrentPatient.push({...b,assignedCrossMatch:cmToUse}); 
+            nextCrossMatchNumber = cmToUse + 1; // Prepare for the next selection
+            
+            const el = d('crossMatchStart_reg'); 
+            // The input field now always shows the *next* number to be used
+            if(el) el.value = nextCrossMatchNumber; 
+            
+            renderSelectedUnitsForCurrentPatient(); 
+            displayCompatibleUnits(); 
+        }
         function removeUnitForCurrentPatient(id){ selectedUnitsForCurrentPatient=selectedUnitsForCurrentPatient.filter(b=>b.id!==id); renderSelectedUnitsForCurrentPatient(); displayCompatibleUnits(); }
         function renderSelectedUnitsForCurrentPatient(){const bd=d('selectedUnitsTable').querySelector('tbody');bd.innerHTML='';if(selectedUnitsForCurrentPatient.length===0){bd.innerHTML='<tr><td colspan="3" class="text-center text-gray-500 py-6">No units selected.</td></tr>';return;}selectedUnitsForCurrentPatient.forEach(b=>{const r=bd.insertRow();r.innerHTML=`<td class="font-bold">${b.assignedCrossMatch}</td><td class="font-medium">${b.bagNumber}</td><td><button type="button" class="action-btn btn-remove-unit" data-bag-id="${b.id}">Remove</button></td>`;});bd.querySelectorAll('.btn-remove-unit').forEach(btn=>btn.onclick=(e)=>{ const bagId = (e.currentTarget||e.target).dataset.bagId; removeUnitForCurrentPatient(bagId); });}
         
