@@ -236,16 +236,16 @@
             font-weight: normal; /* Changed from bold to normal */
         }
         /* Updated column widths */
-        .report-table th:nth-child(1), .report-table td:nth-child(1) { width: 4%; }   /* Sr No */
-        .report-table th:nth-child(2), .report-table td:nth-child(2) { width: 9%; }   /* Cross Match No */
-        .report-table th:nth-child(3), .report-table td:nth-child(3) { width: 10%; }  /* Bag No */
-        .report-table th:nth-child(4), .report-table td:nth-child(4) { width: 12%; }  /* Blood Group & Rh */
-        .report-table th:nth-child(5), .report-table td:nth-child(5) { width: 7%; }   /* Vol. in ml */
-        .report-table th:nth-child(6), .report-table td:nth-child(6) { width: 11%; }  /* Date of Collection */
-        .report-table th:nth-child(7), .report-table td:nth-child(7) { width: 11%; }  /* Date of Expiry */
-        .report-table th:nth-child(8), .report-table td:nth-child(8) { width: 10%; }  /* Compatibility */
-        .report-table th:nth-child(9), .report-table td:nth-child(9) { width: 14%; }  /* Date & Time Of Issue - Reduced */
-        .report-table th:nth-child(10), .report-table td:nth-child(10) { width: 12%; } /* Issued By */
+        .report-table th:nth-child(1), .report-table td:nth-child(1) { width: 5%; }   /* Sr No */
+        .report-table th:nth-child(2), .report-table td:nth-child(2) { width: 10%; }   /* Cross Match No */
+        .report-table th:nth-child(3), .report-table td:nth-child(3) { width: 11%; }  /* Bag No */
+        .report-table th:nth-child(4), .report-table td:nth-child(4) { width: 15%; }  /* Blood Group & Rh */
+        .report-table th:nth-child(5), .report-table td:nth-child(5) { width: 10%; }   /* Vol. in ml */
+        .report-table th:nth-child(6), .report-table td:nth-child(6) { width: 12%; }  /* Date of Collection */
+        .report-table th:nth-child(7), .report-table td:nth-child(7) { width: 12%; }  /* Date of Expiry */
+        .report-table th:nth-child(8), .report-table td:nth-child(8) { width: 14%; }  /* Compatibility */
+        .report-table th:nth-child(9), .report-table td:nth-child(9) { width: 10%; }  /* Date & Time Of Issue - Reduced */
+        .report-table th:nth-child(10), .report-table td:nth-child(10) { width: 7%; } /* Issued By */
         .report-footer {
             margin-top: 0.4cm;
             font-size: 8.5pt; /* Reduced font size for footer */
@@ -276,7 +276,7 @@
             font-weight: 700;
             margin-bottom: 0.05cm;
             width: 100%;
-            font-size: 8.5pt; /* Reduced font size for signatures */
+            font-size: 9pt; 
         }
         .cls-signature-title {
             font-size: 7.5pt; /* Reduced font size */
@@ -286,39 +286,11 @@
             width: 100%;
             margin-left: 1.4cm;
         }
-        .signature-title {
-            font-size: 7.5pt; /* Reduced font size */
-            color: #555;
-            font-weight: normal;
-            text-align: center;
-            width: 100%;
-            margin-left: 0;
-        }
-        .instructions {
-            margin-top: 0.4cm;
-            padding: 0.25cm;
-            background-color: #f9f9f9;
-            border-radius: 4px;
-            border-left: 4px solid #c62828;
-            font-size: 7.5pt;
-        }
-        .instructions h4 {
-            color: #c62828;
-            margin-bottom: 0.15cm;
-            font-size: 8pt;
-            font-weight: normal;
-        }
-        .instructions ol {
-            padding-left: 1cm;
-            column-count: 2;
-            column-gap: 0.5cm;
-        }
-        .instructions li {
-            margin-bottom: 0.15cm;
-            line-height: 1.2;
-            break-inside: avoid;
-            font-weight: normal;
-        }
+        .signature-title {font-size: 8pt;color: #555;font-weight: normal;text-align: center;width: 100%;margin-left: 0;}
+        .instructions {margin-top: 0.4cm;padding: 0.25cm;background-color: #f9f9f9;border-radius: 4px;border-left: 4px solid #c62828;font-size: 7.5pt;}
+        .instructions h4 {color: #c62828;margin-bottom: 0.15cm;font-size: 8pt;font-weight: normal;}
+        .instructions ol {padding-left: 1cm;column-count: 2;column-gap: 0.5cm;}
+        .instructions li {margin-bottom: 0.15cm;line-height: 1.2;break-inside: avoid;font-weight: normal;}
 
         /* --- NEW: Make Tab 1 Form Vertically Compact --- */
 #content-1 .grid.grid-cols-1 div > input,
@@ -407,6 +379,19 @@
         .matrixTable th, .matrixTable td { border:1.2px solid #333; padding:3px 8px;text-align:center;}
         /* This rule is now just for color */
         .remove-btn-matrix { background:#e53e3e; color:#fff; }
+
+	/* New rule for right-aligning Bag Number in the matrix display */
+        .matrixTable tbody td:nth-child(4n+1) {
+            text-align: right;
+            padding-right: 12px; /* Add some padding for visual separation */
+        }
+        /* Override for header rows which must remain centered */
+        .matrixTable thead th {
+             text-align: center;
+        }
+        /* Re-apply left/right alignment for thick borders if needed after matrixTable th/td rule */
+        .matrixTable th, .matrixTable td { border:1.2px solid #333; padding:3px 8px;text-align:center;}
+        /* This rule is now just for color */
 
         #ledgerTable{ display:none;} #printDateStock{ display:block; font-size:1em; font-weight:bold; color:#2c5282; margin-bottom:8px; text-align:center;}
         /* --- End of styles from index.html --- */
@@ -664,7 +649,8 @@
                                 </div>
                                 <div class="heading-center">
                                     <h2 style="font-weight: bold; font-size: 14pt; margin-bottom: 0.1cm;">CENTRAL RAILWAY</h2>
-                                    <p style="font-weight: normal; font-size: 10pt; margin-bottom: 0.1cm;">Bharatratna Dr. Babasaheb Ambedkar Memorial Hospital, Byculla, Mumbai-27</p>
+                                    <p style="font-weight: normal; font-size: 10pt; margin-bottom: 0.1cm;">Bharatratna Dr. Babasaheb Ambedkar Memorial Hospital</p>
+                                    <p style="font-weight: normal; font-size: 10pt; margin-bottom: 0.1cm;">Byculla, Mumbai-27</p>
                                     <p style="font-weight: bold; font-size: 10pt; margin-bottom: 0.1cm;">BLOOD STORAGE CENTRE</p>
                                     <p style="font-weight: bold; font-size: 8.5pt;">Licence No.: BSC/GM-03/2013</p>
                                 </div>
@@ -722,9 +708,9 @@
                             </table>
                         </div>
                         <div class="report-footer">
-                            <p style="margin-bottom: 0.2cm;font-size: 9.5pt;">Cross matching has been performed using <strong>Saline, Albumin &amp; Coombs</strong> methods.</p>
-                            <p style="margin-bottom: 0.3cm;font-size: 9.5pt;">Blood units are tested Negative for <strong>HIV 1&amp;2, HBsAg, HCV, VDRL, MP &amp; Abnormal Antibodies</strong> </p>
-                            <p style="margin-bottom: 0.5cm;font-size: 9.5pt;">Reservation is valid until: <strong><span id="reportReservationDate"></span></strong></p>
+                            <p style="margin-bottom: 0.3cm;font-size: 9pt;">Cross matching has been performed using <strong>Saline, Albumin &amp; Coombs</strong> methods.</p>
+                            <p style="margin-bottom: 0.3cm;font-size: 9pt;">Blood units are tested Negative for <strong>HIV 1&amp;2, HBsAg, HCV, VDRL, MP &amp; Abnormal Antibodies</strong> </p>
+                            <p style="margin-bottom: 0.5cm;font-size: 9pt;">Reservation is valid until: <strong><span id="reportReservationDate"></span></strong></p>
                             <p style="margin-bottom: 0.75cm;font-size: 7.5pt;text-align: center;"><strong>*Please note that after the reservation date, the blood units will be released and will no longer be available for transfusion to this patient.*</strong></p>
                             <div class="signature-line">
                                 <div class="signature-left">
@@ -757,7 +743,7 @@
                                     <li>Observe the patient for febrile reaction, hematuria and oliguria.</li>
                                     <li>In case of any reaction, stop the transfusion, inform the physician concerned & also intimate us.</li>
                                 </ol>
-                                <p style="margin-top: 0.3cm; font-weight: bold;text-align: center;">Blood Unit once issued will not be taken back.</p>
+                                <p style="margin-top: 0.3cm; font-weight: bold;text-align: center;">Blood Unit once issued will not be taken back after 30 minutes of issue.</p>
                                 <p style="margin-top: 0.3cm; font-weight: bold;text-align: center;">Please note that blood transfusion is a dangerous procedure. Use utmost care.</p>
                             </div>
                         </div>
@@ -775,7 +761,7 @@
                      </div>
                     <div id="adminView">
                          <h3 class="text-xl font-medium text-gray-700 mb-4 text-center">Add New Blood Bag</h3>
-                         <form id="addBagForm"><div><label for="bagPrefix_stock">Source</label><select id="bagPrefix_stock" required><option value="C-">C-</option><option value="I-">I-</option></select></div><div><label for="bagNumber">Bag No.</label><input type="text" id="bagNumber" required></div><div><label for="bloodGroup_stock">Blood Group</label><select id="bloodGroup_stock" required><option value="A+">A+</option><option value="A-">A-</option><option value="B+">B+</option><option value="B-">B-</option><option value="AB+">AB+</option><option value="AB-">AB-</option><option value="O+">O+</option><option value="O-">O-</option></select></div><div><label for="collectionDate_stock">Collection Date</label><input type="date" id="collectionDate_stock" required></div><div><label for="volume_stock">Volume (mL)</label><input type="number" id="volume_stock" min="100" max="500" value="350" required></div><div><label for="remarks_stock">Remarks</label><input type="text" id="remarks_stock" placeholder="Optional notes"></div><button type="submit">Add Bag</button></form>
+                         <form id="addBagForm"><div><label for="bagPrefix_stock">Source</label><select id="bagPrefix_stock" required><option value="C-">C-</option><option value="I-">I-</option></select></div><div><label for="bagNumber">Bag No.</label><input type="text" id="bagNumber" required class="text-right"></div><div><label for="bloodGroup_stock">Blood Group</label><select id="bloodGroup_stock" required><option value="A+">A+</option><option value="A-">A-</option><option value="B+">B+</option><option value="B-">B-</option><option value="AB+">AB+</option><option value="AB-">AB-</option><option value="O+">O+</option><option value="O-">O-</option></select></div><div><label for="collectionDate_stock">Collection Date</label><input type="date" id="collectionDate_stock" required></div><div><label for="volume_stock">Volume (mL)</label><input type="number" id="volume_stock" min="100" max="500" value="350" required></div><div><label for="remarks_stock">Remarks</label><input type="text" id="remarks_stock" placeholder="Optional notes"></div><button type="submit">Add Bag</button></form>
                          <button type="button" id="printButton" onclick="printStock()">Print</button>
                          <table id="screenMatrixTable" class="matrixTable">
                             <!-- This will be populated by renderAdminMatrix -->
@@ -1541,7 +1527,7 @@ function loadRegistrationForEdit(id) {
                 }
                 .report-table {
                     border-collapse: collapse;
-                    font-size: 8.5pt;
+                    font-size: 9pt;
                     width: 100%;
                 }
                 .report-table, .report-table th, .report-table td {
@@ -1552,16 +1538,16 @@ function loadRegistrationForEdit(id) {
                     text-align: center;
                     font-weight: normal;
                 }
-                .report-table th:nth-child(1), .report-table td:nth-child(1) { width: 4%; }
-                .report-table th:nth-child(2), .report-table td:nth-child(2) { width: 9%; }
-                .report-table th:nth-child(3), .report-table td:nth-child(3) { width: 10%; }
-                .report-table th:nth-child(4), .report-table td:nth-child(4) { width: 12%; }
-                .report-table th:nth-child(5), .report-table td:nth-child(5) { width: 7%; }
-                .report-table th:nth-child(6), .report-table td:nth-child(6) { width: 11%; }
-                .report-table th:nth-child(7), .report-table td:nth-child(7) { width: 11%; }
-                .report-table th:nth-child(8), .report-table td:nth-child(8) { width: 10%; }
-                .report-table th:nth-child(9), .report-table td:nth-child(9) { width: 14%; }
-                .report-table th:nth-child(10), .report-table td:nth-child(10) { width: 12%; }
+                .report-table th:nth-child(1), .report-table td:nth-child(1) {width: 5%;}
+                .report-table th:nth-child(2), .report-table td:nth-child(2) {width: 10%;}
+                .report-table th:nth-child(3), .report-table td:nth-child(3) {width: 11%;}
+                .report-table th:nth-child(4), .report-table td:nth-child(4) {width: 15%;}
+                .report-table th:nth-child(5), .report-table td:nth-child(5) {width: 10%;}
+                .report-table th:nth-child(6), .report-table td:nth-child(6) {width: 12%;}
+                .report-table th:nth-child(7), .report-table td:nth-child(7) {width: 12%;}
+                .report-table th:nth-child(8), .report-table td:nth-child(8) {width: 14%;}
+                .report-table th:nth-child(9), .report-table td:nth-child(9) {width: 10%;}
+                .report-table th:nth-child(10), .report-table td:nth-child(10) {width: 7%;}
                 .signature-line {
                     display: flex;
                     justify-content: space-between;
@@ -1573,10 +1559,10 @@ function loadRegistrationForEdit(id) {
                     font-weight: 700;
                     margin-bottom: 0.05cm;
                     width: 100%;
-                    font-size: 8.5pt;
+                    font-size: 9pt;
                 }
                 .cls-signature-title, .signature-title {
-                    font-size: 7.5pt;
+                    font-size: 8pt;
                     color: #555;
                     font-weight: normal;
                     text-align: center;
@@ -1590,7 +1576,7 @@ function loadRegistrationForEdit(id) {
                     padding: 0.25cm;
                     background-color: #f9f9f9;
                     border-left: 4px solid #c62828;
-                    font-size: 7.5pt;
+                    font-size: 7.8pt;
                 }
 .instructions ol {
                     padding-left: 1cm;
@@ -1757,31 +1743,31 @@ function loadRegistrationForEdit(id) {
                 <table class="matrixTable">
                     <thead>
                         <tr>
-                            <th colspan="4" class="group-header matrix-thick-left">A+</th>
-                            <th colspan="4" class="group-header matrix-thick-left">B+</th>
-                            <th colspan="4" class="group-header matrix-thick-left">O+</th>
-                            <th colspan="4" class="group-header matrix-thick-left matrix-thick-right">AB+</th>
+                            <th colspan="4" class="group-header matrix-thick-left">A POS</th>
+                            <th colspan="4" class="group-header matrix-thick-left">B POS</th>
+                            <th colspan="4" class="group-header matrix-thick-left">O POS</th>
+                            <th colspan="4" class="group-header matrix-thick-left matrix-thick-right">AB POS</th>
                         </tr>
                         <tr>
-                            <th class="sub-header matrix-thick-left">Bag No.</th><th class="sub-header">Collection</th><th class="sub-header">Expiry</th><th class="sub-header">Vol.</th>
-                            <th class="sub-header matrix-thick-left">Bag No.</th><th class="sub-header">Collection</th><th class="sub-header">Expiry</th><th class="sub-header">Vol.</th>
-                            <th class="sub-header matrix-thick-left">Bag No.</th><th class="sub-header">Collection</th><th class="sub-header">Expiry</th><th class="sub-header">Vol.</th>
-                            <th class="sub-header matrix-thick-left">Bag No.</th><th class="sub-header">Collection</th><th class="sub-header">Expiry</th><th class="sub-header matrix-thick-right">Vol.</th>
+                            <th class="sub-header matrix-thick-left">Bag No.</th><th class="sub-header">DoC</th><th class="sub-header">DoE</th><th class="sub-header">Vol.</th>
+                            <th class="sub-header matrix-thick-left">Bag No.</th><th class="sub-header">DoC</th><th class="sub-header">DoE</th><th class="sub-header">Vol.</th>
+                            <th class="sub-header matrix-thick-left">Bag No.</th><th class="sub-header">DoC</th><th class="sub-header">DoE</th><th class="sub-header">Vol.</th>
+                            <th class="sub-header matrix-thick-left">Bag No.</th><th class="sub-header">DoC</th><th class="sub-header">DoE</th><th class="sub-header matrix-thick-right">Vol.</th>
                         </tr>
                     </thead>
                     <tbody>${matrixBodyPos}</tbody>
                     <thead>
                         <tr>
-                            <th colspan="4" class="group-header matrix-thick-left">A-</th>
-                            <th colspan="4" class="group-header matrix-thick-left">B-</th>
-                            <th colspan="4" class="group-header matrix-thick-left">O-</th>
-                            <th colspan="4" class="group-header matrix-thick-left matrix-thick-right">AB-</th>
+                            <th colspan="4" class="group-header matrix-thick-left">A NEG</th>
+                            <th colspan="4" class="group-header matrix-thick-left">B NEG</th>
+                            <th colspan="4" class="group-header matrix-thick-left">O NEG</th>
+                            <th colspan="4" class="group-header matrix-thick-left matrix-thick-right">AB NEG</th>
                         </tr>
                         <tr>
-                            <th class="sub-header matrix-thick-left">Bag No.</th><th class="sub-header">Collection</th><th class="sub-header">Expiry</th><th class="sub-header">Vol.</th>
-                            <th class="sub-header matrix-thick-left">Bag No.</th><th class="sub-header">Collection</th><th class="sub-header">Expiry</th><th class="sub-header">Vol.</th>
-                            <th class="sub-header matrix-thick-left">Bag No.</th><th class="sub-header">Collection</th><th class="sub-header">Expiry</th><th class="sub-header">Vol.</th>
-                            <th class="sub-header matrix-thick-left">Bag No.</th><th class="sub-header">Collection</th><th class="sub-header">Expiry</th><th class="sub-header matrix-thick-right">Vol.</th>
+                            <th class="sub-header matrix-thick-left">Bag No.</th><th class="sub-header">DoC</th><th class="sub-header">DoE</th><th class="sub-header">Vol.</th>
+                            <th class="sub-header matrix-thick-left">Bag No.</th><th class="sub-header">DoC</th><th class="sub-header">DoE</th><th class="sub-header">Vol.</th>
+                            <th class="sub-header matrix-thick-left">Bag No.</th><th class="sub-header">DoC</th><th class="sub-header">DoE</th><th class="sub-header">Vol.</th>
+                            <th class="sub-header matrix-thick-left">Bag No.</th><th class="sub-header">DoC</th><th class="sub-header">DoE</th><th class="sub-header matrix-thick-right">Vol.</th>
                         </tr>
                     </thead>
                     <tbody>${matrixBodyNeg}</tbody>
@@ -1863,18 +1849,18 @@ function loadRegistrationForEdit(id) {
                     <div class="print-container">
                         <div class="print-header">
                             <h2>Blood Stock Report</h2>
-                            <p>Dr. BAM Hospital Blood Storage Centre - As on: ${stockDate}</p>
+                            <p>Dr. BAM Hospital Blood Storage Centre - As on: ${stockDate} At: 10:00 AM</p>
                         </div>
                         <div class="summary-container">
                             <div class="summary-item">Total: <span>${bloodStock.length}</span></div>
-                            <div class="summary-item">A+: <span>${bloodStock.filter(b => b.group === 'A+').length}</span></div>
-                            <div class="summary-item">B+: <span>${bloodStock.filter(b => b.group === 'B+').length}</span></div>
-                            <div class="summary-item">O+: <span>${bloodStock.filter(b => b.group === 'O+').length}</span></div>
-                            <div class="summary-item">AB+: <span>${bloodStock.filter(b => b.group === 'AB+').length}</span></div>
-                            <div class="summary-item">A-: <span>${bloodStock.filter(b => b.group === 'A-').length}</span></div>
-                            <div class="summary-item">B-: <span>${bloodStock.filter(b => b.group === 'B-').length}</span></div>
-                            <div class="summary-item">O-: <span>${bloodStock.filter(b => b.group === 'O-').length}</span></div>
-                            <div class="summary-item">AB-: <span>${bloodStock.filter(b => b.group === 'AB-').length}</span></div>
+                            <div class="summary-item">A POS: <span>${bloodStock.filter(b => b.group === 'A+').length}</span></div>
+                            <div class="summary-item">B POS: <span>${bloodStock.filter(b => b.group === 'B+').length}</span></div>
+                            <div class="summary-item">O POS: <span>${bloodStock.filter(b => b.group === 'O+').length}</span></div>
+                            <div class="summary-item">AB POS: <span>${bloodStock.filter(b => b.group === 'AB+').length}</span></div>
+                            <div class="summary-item">A NEG: <span>${bloodStock.filter(b => b.group === 'A-').length}</span></div>
+                            <div class="summary-item">B NEG: <span>${bloodStock.filter(b => b.group === 'B-').length}</span></div>
+                            <div class="summary-item">O NEG: <span>${bloodStock.filter(b => b.group === 'O-').length}</span></div>
+                            <div class="summary-item">AB NEG: <span>${bloodStock.filter(b => b.group === 'AB-').length}</span></div>
                         </div>
                         ${gridHtml}
                         <div class="print-footer">
