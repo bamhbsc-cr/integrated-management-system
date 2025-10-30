@@ -2344,102 +2344,117 @@ function loadRegistrationForEdit(id) {
         function refreshAllStockUI(stock, isPublicView) { try { updateSummaryBadges(stock); renderAdminMatrix(stock); if (isPublicView) renderPublicMatrix(stock); if (!d('content-1').classList.contains('hidden')) displayCompatibleUnits(); if (!d('content-2').classList.contains('hidden')) displayPendingRegistrations(); } catch (e) { console.error("UI refresh error:", e); } }
         function listenForUpdates(isPublicView) { if (firebaseConfig && db) { /* Firebase logic */ } else { loadLocalData(); buildPatientMap(); refreshAllStockUI(bloodStock,isPublicView); if (!d('content-2').classList.contains('hidden')) displayPendingRegistrations(); } }
 
-        // --- RESERVATIONS: NEW TAB FUNCTIONS ---
-        function getReservationsFromRegistrations() {
-            // Reservations are registrations which have reservationDate set.
-            // We'll present pending_crossmatch as 'reserved', and allow cancelled state.
-            return registrations.filter(r => r.reservationDate && (r.status === 'pending_crossmatch' || r.status === 'reserved' || r.status === 'cancelled_reservation' || r.status === 'crossmatch_ok' || !r.status));
-        }
+      
 
-        function displayReservations() {
-            // First run cleanup of expired reservations
-            cleanupExpiredReservations();
+        // --- RESERVATIONS: NEW TAB FUNCTIONS (MODIFIED) ---
+function getReservationsFromRegistrations() {
+    // Reservations are registrations which have reservationDate set.
+    // We'll present pending_crossmatch as 'reserved', and allow cancelled state.
+    return registrations.filter(r => r.reservationDate && (r.status === 'pending_crossmatch' || r.status === 'reserved' || r.status === 'cancelled_reservation' || r.status === 'crossmatch_ok' || !r.status));
+}
 
-            const tableBody = d('reservationTable').querySelector('tbody');
-            const searchTerm = (d('reservation-search')?.value || '').toLowerCase();
-            tableBody.innerHTML = '';
-            const allRes = getReservationsFromRegistrations();
-            let filtered = allRes.filter(rec => {
-                // search by name, cr, bag number
-                if (!searchTerm) return true;
-                const name = (rec.patientDetails.name || '').toLowerCase();
-                const cr = (rec.patientDetails.crNumber || '').toLowerCase();
-                const bags = rec.allottedUnits.map(u => (u.bagNumber || '').toLowerCase()).join(' ');
-                return name.includes(searchTerm) || cr.includes(searchTerm) || bags.includes(searchTerm);
-            });
+function displayReservations() {
+    // First run cleanup of expired reservations (keeps the 2-day grace period for final deletion)
+    cleanupExpiredReservations();
 
-            if (filtered.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="7" class="text-center text-gray-500 py-6">No reservations found${searchTerm ? ' matching search' : ''}.</td></tr>`;
-                return;
-            }
+    const tableBody = d('reservationTable').querySelector('tbody');
+    const searchTerm = (d('reservation-search')?.value || '').toLowerCase();
+    tableBody.innerHTML = '';
+    const allRes = getReservationsFromRegistrations();
+    let filtered = allRes.filter(rec => {
+        // search by name, cr, bag number
+        if (!searchTerm) return true;
+        const name = (rec.patientDetails.name || '').toLowerCase();
+        const cr = (rec.patientDetails.crNumber || '').toLowerCase();
+        const bags = rec.allottedUnits.map(u => (u.bagNumber || '').toLowerCase()).join(' ');
+        return name.includes(searchTerm) || cr.includes(searchTerm) || bags.includes(searchTerm);
+    });
 
-            // sort by reservationDate ascending (nearest first)
-            filtered.sort((a,b) => new Date(a.reservationDate) - new Date(b.reservationDate));
+    if (filtered.length === 0) {
+        tableBody.innerHTML = `<tr><td colspan="7" class="text-center text-gray-500 py-6">No reservations found${searchTerm ? ' matching search' : ''}.</td></tr>`;
+        return;
+    }
 
-            filtered.forEach(rec => {
-                const tr = tableBody.insertRow();
-                const pd = rec.patientDetails || {};
-                
-                // NEW: Build vertical bag list
-                let bagListHtml = '';
-                if (!rec.allottedUnits || rec.allottedUnits.length === 0) {
-                    bagListHtml = '<span class="text-gray-500 text-sm">No units</span>';
-                } else {
-                    rec.allottedUnits.forEach(unit => {
-                        bagListHtml += `
-                            <div class="bag-item">
-                                <span>${unit.bagNumber}</span>
-                                <button class="btn-issue-bag" data-reg-id="${rec.id}" data-bag-number="${unit.bagNumber}">Issue</button>
-                            </div>
-                        `;
-                    });
-                }
-                
-                const resTill = formatDate(rec.reservationDate);
-                let dispStatus = 'Unknown'; // Default
-                if (rec.status === 'cancelled_reservation' || rec.status === 'cancelled') {
-                    dispStatus = 'Cancelled';
-                } else if (rec.isImmediateAllotment) {
-                    dispStatus = 'Allotted'; // Show Allotted if it was immediate
-                } else {
-                    dispStatus = 'Reserved'; // Otherwise, show Reserved
-                }
-                // Determine CSS class based on Cancelled vs Active
-                const statusClass = (dispStatus === 'Cancelled') ? 'reservation-status-cancelled' : 'reservation-status-reserved';
-                                
-                tr.innerHTML = `
-                    <td>${pd.name || ''}</td>
-                    <td>${pd.crNumber || ''}</td>
-                    <td>${pd.bloodGroup || ''}</td>
-                    <td class="bag-list-cell">${bagListHtml}</td>
-                    <td>${resTill}</td>
-                    <td class="${statusClass}">${dispStatus}</td>
-                    <td>
-                        <button class="btn-res-edit" data-res-id="${rec.id}">Edit</button>
-                        <button class="btn-res-delete" data-res-id="${rec.id}">Delete</button>
-                    </td>
+    // sort by reservationDate ascending (nearest first)
+    filtered.sort((a,b) => new Date(a.reservationDate) - new Date(b.reservationDate));
+
+    // --- NEW: Calculate 'expired' status for display ---
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    filtered.forEach(rec => {
+        const tr = tableBody.insertRow();
+        const pd = rec.patientDetails || {};
+
+        // NEW LOGIC: Check if reservationDate has passed
+        let reservationDate = new Date(rec.reservationDate + 'T00:00:00');
+        let isExpiredForDisplay = reservationDate < today;
+
+        // NEW: Build vertical bag list
+        let bagListHtml = '';
+        if (!rec.allottedUnits || rec.allottedUnits.length === 0) {
+            bagListHtml = '<span class="text-gray-500 text-sm">No units</span>';
+        } else {
+            rec.allottedUnits.forEach(unit => {
+                bagListHtml += `
+                    <div class="bag-item">
+                        <span>${unit.bagNumber}</span>
+                        <button class="btn-issue-bag" data-reg-id="${rec.id}" data-bag-number="${unit.bagNumber}">Issue</button>
+                    </div>
                 `;
             });
-
-            // attach handlers
-            tableBody.querySelectorAll('.btn-res-edit').forEach(btn => btn.onclick = (e) => {
-                const id = (e.currentTarget||e.target).dataset.resId;
-                openReservationModal(id);
-            });
-
-            tableBody.querySelectorAll('.btn-res-delete').forEach(btn => btn.onclick = (e) => {
-                const id = (e.currentTarget||e.target).dataset.resId;
-                deleteReservation(id);
-            });
-            
-            // NEW: Add handlers for issue buttons
-            tableBody.querySelectorAll('.btn-issue-bag').forEach(btn => btn.onclick = (e) => {
-                const target = e.currentTarget || e.target;
-                const regId = target.dataset.regId;
-                const bagNumber = target.dataset.bagNumber;
-                issueReservedBag(regId, bagNumber);
-            });
         }
+
+        const resTill = formatDate(rec.reservationDate);
+        let dispStatus = 'Unknown'; // Default
+
+        if (rec.status === 'cancelled_reservation' || rec.status === 'cancelled') {
+            dispStatus = 'Cancelled';
+        } else if (rec.isImmediateAllotment) {
+            dispStatus = 'Allotted'; // Show Allotted if it was immediate
+        } else if (isExpiredForDisplay) { 
+            // *** THE KEY CHANGE IS HERE ***
+            dispStatus = 'Expired / Cancelled'; // Display as Expired/Cancelled if date passed
+        } else {
+            dispStatus = 'Reserved'; // Otherwise, show Reserved
+        }
+        
+        // Determine CSS class based on status
+        const statusClass = (dispStatus === 'Expired / Cancelled' || dispStatus === 'Cancelled') ? 'reservation-status-cancelled' : 'reservation-status-reserved';
+
+        tr.innerHTML = `
+            <td>${pd.name || ''}</td>
+            <td>${pd.crNumber || ''}</td>
+            <td>${pd.bloodGroup || ''}</td>
+            <td class="bag-list-cell">${bagListHtml}</td>
+            <td>${resTill}</td>
+            <td class="${statusClass}">${dispStatus}</td>
+            <td>
+                <button class="btn-res-edit" data-res-id="${rec.id}">Edit</button>
+                <button class="btn-res-delete" data-res-id="${rec.id}">Delete</button>
+            </td>
+        `;
+    });
+
+    // attach handlers
+    tableBody.querySelectorAll('.btn-res-edit').forEach(btn => btn.onclick = (e) => {
+        const id = (e.currentTarget||e.target).dataset.resId;
+        openReservationModal(id);
+    });
+
+    tableBody.querySelectorAll('.btn-res-delete').forEach(btn => btn.onclick = (e) => {
+        const id = (e.currentTarget||e.target).dataset.resId;
+        deleteReservation(id);
+    });
+
+    // NEW: Add handlers for issue buttons
+    tableBody.querySelectorAll('.btn-issue-bag').forEach(btn => btn.onclick = (e) => {
+        const target = e.currentTarget || e.target;
+        const regId = target.dataset.regId;
+        const bagNumber = target.dataset.bagNumber;
+        issueReservedBag(regId, bagNumber);
+    });
+} 
         
         // NEW: Function to issue a single reserved bag
         function issueReservedBag(regId, bagNumber) {
