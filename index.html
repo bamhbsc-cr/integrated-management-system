@@ -30,6 +30,22 @@
         .status-allotted { color: #ca8a04; font-weight: 600; font-style: italic; }
         .status-available { color: #16a34a; font-weight: 600; }
         .status-crossmatch_ok { color: #16a34a; font-weight: 600; }
+        .status-pending_crossmatch, .status-pending { 
+        color: #800000; /* Maroon color for PENDING */
+        font-weight: 700;
+        background-color: #ffe0e6; /* Light pink background */
+        padding: 2px 6px;
+        border-radius: 4px;
+        display: inline-block;
+    }
+    .status-crossmatch_ok, .status-compatible { 
+        color: #006400; /* Dark green color for COMPATIBLE */
+        font-weight: 700;
+        background-color: #e6ffe6; /* Light green background */
+        padding: 2px 6px;
+        border-radius: 4px;
+        display: inline-block;
+    }
 
         /* --- NEW: Make Tab 1 Content Smaller --- */
 #content-1 h3 { font-size: 1.15rem; }
@@ -622,7 +638,7 @@
                      <h3 class="text-lg font-medium text-gray-700 mb-3">Select Registration to Prepare Report:</h3>
                      <div class="registration-table-container">
                         <table class="registration-table" id="pendingRegistrationsTable">
-                            <thead><tr><th>CR Number</th><th>Patient Name</th><th>Blood Group</th><th>Units Allotted</th><th>Status</th><th>Actions</th></tr></thead>
+                            <thead><tr><th>CR Number</th><th>Patient Name</th><th>Blood Group</th><th>Units Allotted</th><th>Crossmatch Status</th><th>Actions</th></tr></thead>
                             <tbody><tr><td colspan="6" class="text-center text-gray-500 py-6">No pending registrations found.</td></tr></tbody>
                         </table>
                     </div>
@@ -1334,11 +1350,19 @@ function loadRegistrationForEdit(id) {
             body.innerHTML = '';
             const yS = new Date().getFullYear().toString().slice(-2);
 
-            // Build QR code text
-            let qrData = `Name:${pd.name || 'N/A'}`;
-            qrData += `\n${pd.age || 'N/A'}${pd.age ? 'Y/' : ''}${pd.gender === 'MALE' ? 'M' : pd.gender === 'FEMALE' ? 'F' : ''}`;
-            qrData += `\nCR No:${pd.crNumber || 'N/A'}`;
-            units.forEach((u, i) => qrData += `\nBag${i+1}:${u.bagNumber || 'N/A'}`);
+            // Build QR code text - MODIFIED to include Patient BG, Bag No. and Expiry Date only
+            let qrData = `PatName:${pd.name || 'N/A'}`;
+            qrData += `\nCRNo:${pd.crNumber || 'N/A'}`;
+            // Added Patient's Blood Group for patient safety verification
+            qrData += `\nPatBG:${pd.bloodGroup || 'N/A'}`; 
+
+            units.forEach((u, i) => {
+                // Formatting the unit as requested: 'BagNumber , Expiry:dd-mm-yy.'
+                // Note: u.bagNumber already includes the C- or I- prefix.
+                const bagInfo = `${u.bagNumber || 'N/A'} , Expiry:${ddmmyy(u.expiryDate) || 'N/A'}.`;
+                qrData += `\nBag${i+1}:${bagInfo}`; 
+            });
+            // --- END MODIFIED QR CODE DATA CONSTRUCTION ---
 
             const qrC = d('qrCodeContainer');
             qrC.innerHTML = '';
@@ -1635,20 +1659,59 @@ function loadRegistrationForEdit(id) {
             return true; 
         }
         
-        function displayPendingRegistrations() {
-             const tableBody = d('pendingRegistrationsTable').querySelector('tbody');
-             const searchTerm = (d('registrationSearch')?.value || '').toLowerCase();
-             tableBody.innerHTML = '';
-             const filteredRegs = registrations.filter(reg => (reg.status === 'pending_crossmatch' || reg.status === 'crossmatch_ok' || reg.status === 'crossmatch ok') && (!searchTerm || reg.patientDetails.name.toLowerCase().includes(searchTerm) || reg.patientDetails.crNumber.toLowerCase().includes(searchTerm)));
-             if (filteredRegs.length === 0) { tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-gray-500 py-6">No pending regs found${searchTerm ? ' matching search' : ''}.</td></tr>`; return; }
-             filteredRegs.sort((a,b) => new Date(b.registrationTimestamp) - new Date(a.registrationTimestamp));
-             filteredRegs.forEach(reg => { const r = tableBody.insertRow(); r.innerHTML = `<td>${reg.patientDetails.crNumber}</td><td>${reg.patientDetails.name}</td><td>${reg.patientDetails.bloodGroup}</td><td>${reg.allottedUnits.length}</td><td class="status-${reg.status}">${reg.status.replace('_',' ')}</td><td><button type="button" class="action-btn btn-edit-registration" data-reg-id="${reg.id}">Edit</button><button type="button" class="action-btn btn-prepare-report" data-reg-id="${reg.id}">Prepare & Print</button><button type="button" class="action-btn btn-delete-registration" data-reg-id="${reg.id}">Cancel</button></td>`; });
-             
-             // --- ALL LISTENERS MUST BE INSIDE THE FUNCTION ---
-             tableBody.querySelectorAll('.btn-prepare-report').forEach(btn => btn.onclick = (e) => prepareReportForPatient((e.currentTarget||e.target).dataset.regId, true));
-             tableBody.querySelectorAll('.btn-delete-registration').forEach(btn => btn.onclick = (e) => cancelRegistration((e.currentTarget||e.target).dataset.regId));
-             tableBody.querySelectorAll('.btn-edit-registration').forEach(btn => btn.onclick = (e) => loadRegistrationForEdit((e.currentTarget||e.target).dataset.regId));
-         } // <-- THIS IS THE CORRECT CLOSING BRACE
+        // ... existing code before the function ...
+
+function displayPendingRegistrations() {
+    const tableBody = d('pendingRegistrationsTable').querySelector('tbody');
+    const searchTerm = (d('registrationSearch')?.value || '').toLowerCase();
+    tableBody.innerHTML = '';
+    
+    // Filter to only include registrations that are pending or crossmatch_ok
+    const filteredRegs = registrations.filter(reg => 
+        (reg.status === 'pending_crossmatch' || reg.status === 'crossmatch_ok' || reg.status === 'crossmatch ok') && 
+        (!searchTerm || reg.patientDetails.name.toLowerCase().includes(searchTerm) || reg.patientDetails.crNumber.toLowerCase().includes(searchTerm))
+    );
+    
+    if (filteredRegs.length === 0) { 
+        tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-gray-500 py-6">No pending regs found${searchTerm ? ' matching search' : ''}.</td></tr>`; 
+        return; 
+    }
+    
+    filteredRegs.sort((a,b) => new Date(b.registrationTimestamp) - new Date(a.registrationTimestamp));
+    
+    filteredRegs.forEach(reg => { 
+        const r = tableBody.insertRow(); 
+        
+        let displayStatus = reg.status;
+        if (reg.status === 'pending_crossmatch') {
+            displayStatus = 'PENDING'; // New display name
+        } else if (reg.status === 'crossmatch_ok' || reg.status === 'crossmatch ok') {
+            displayStatus = 'COMPATIBLE'; // New display name
+        }
+
+        r.innerHTML = `
+            <td>${reg.patientDetails.crNumber}</td>
+            <td>${reg.patientDetails.name}</td>
+            <td>${reg.patientDetails.bloodGroup}</td>
+            <td>${reg.allottedUnits.length}</td>
+            
+            <td class="status-${reg.status}">${displayStatus}</td>
+            
+            <td>
+                <button type="button" class="action-btn btn-edit-registration" data-reg-id="${reg.id}">Edit</button>
+                <button type="button" class="action-btn btn-prepare-report" data-reg-id="${reg.id}">Prepare & Print</button>
+                <button type="button" class="action-btn btn-delete-registration" data-reg-id="${reg.id}">Cancel</button>
+            </td>
+        `; 
+    });
+    
+    // --- ALL LISTENERS MUST BE INSIDE THE FUNCTION ---
+    tableBody.querySelectorAll('.btn-prepare-report').forEach(btn => btn.onclick = (e) => prepareReportForPatient((e.currentTarget||e.target).dataset.regId, true));
+    tableBody.querySelectorAll('.btn-delete-registration').forEach(btn => btn.onclick = (e) => cancelRegistration((e.currentTarget||e.target).dataset.regId));
+    tableBody.querySelectorAll('.btn-edit-registration').forEach(btn => btn.onclick = (e) => loadRegistrationForEdit((e.currentTarget||e.target).dataset.regId));
+} // <-- THIS IS THE CORRECT CLOSING BRACE
+
+// ... existing code after the function ...
 
          function cancelRegistration(id) {
              if (!confirm("Cancel registration & release units?")) return;
