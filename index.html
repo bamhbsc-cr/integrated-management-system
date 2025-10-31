@@ -1351,11 +1351,11 @@ function loadRegistrationForEdit(id) {
             const yS = new Date().getFullYear().toString().slice(-2);
 
             // Build QR code text - MODIFIED to include Patient BG, Bag No. and Expiry Date only
-            let qrData = `PatName:${pd.name || 'N/A'}`;
+            let qrData = `Pat.Name:${pd.name || 'N/A'}`;
+            qrData += `\n${pd.age || 'N/A'}${pd.age ? 'Y/' : ''}${pd.gender === 'MALE' ? 'M' : pd.gender === 'FEMALE' ? 'F' : ''}`;
             qrData += `\nCRNo:${pd.crNumber || 'N/A'}`;
-            // Added Patient's Blood Group for patient safety verification
-            qrData += `\nPatBG:${pd.bloodGroup || 'N/A'}`; 
-
+            qrData += `\nPat.BG:${pd.bloodGroup || 'N/A'}`;
+                      
             units.forEach((u, i) => {
                 // Formatting the unit as requested: 'BagNumber , Expiry:dd-mm-yy.'
                 // Note: u.bagNumber already includes the C- or I- prefix.
