@@ -493,7 +493,7 @@
             }
             
             /* Hide all action elements when printing tab 3 (if user prints from browser) */
-            #addBagForm, #printButton, .action-btn-matrix, .status-dot { 
+            #addBagForm, #printButton, #printPublicButton, .action-btn-matrix, .status-dot { 
                display: none !important; 
             }
 
@@ -514,7 +514,6 @@
         </div>
     </div>
 
-    <!-- Reservation Edit Modal -->
     <div id="reservation-modal" class="hidden modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="reservation-modal-title">
         <div class="modal-card">
             <h3 id="reservation-modal-title" class="text-lg font-semibold text-sky-700 mb-4">Edit Reservation</h3>
@@ -558,7 +557,7 @@
     </div>
     
     <header class="bg-sky-700 shadow-lg p-4 sticky top-0 z-10 header">
-    <div class="container mx-auto flex justify-between items-center">
+    <div class="flex justify-between items-center w-full px-4">
         
         <div class="flex items-center gap-4">
             <img src="BSC.png" alt="Blood Storage Centre Logo" class="h-14 w-14 rounded-full">
@@ -573,63 +572,108 @@
     </div>
 </header>
 
-
-    <div class="flex flex-col flex-1 container mx-auto px-4 py-8">
-        <div class="bg-white p-2 rounded-xl shadow-lg mb-8">
-            <div class="flex space-x-2 md:space-x-4 justify-center" role="tablist">
-                 <button type="button" id="tab-1"  class="tab-btn active w-full md:w-auto px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none" role="tab" aria-controls="content-1" aria-selected="true">REGISTRATION</button>
-                 <button type="button" id="tab-2"  class="tab-btn w-full md:w-auto px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none" role="tab" aria-controls="content-2" aria-selected="false">VALIDATION</button>
-                 <button type="button" id="tab-3"  class="tab-btn w-full md:w-auto px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none" role="tab" aria-controls="content-3" aria-selected="false">BLOOD INVENTORY</button>
-                 <button type="button" id="tab-4"  class="tab-btn w-full md:w-auto px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none" role="tab" aria-controls="content-4" aria-selected="false">RESERVATIONS</button>
-                 <button type="button" id="tab-5"  class="tab-btn w-full md:w-auto px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none" role="tab" aria-controls="content-5" aria-selected="false">ARCHIVE</button>
+<div class="w-full mx-auto px-2 py-8 flex flex-col md:flex-row flex-1 gap-4">
+    
+    <nav class="w-full md:w-44 flex-shrink-0 sticky top-4 self-start">
+        <div class="bg-white p-4 rounded-xl shadow-lg md:h-full">
+            <div class="flex flex-col space-y-2" role="tablist">
+                 <button type="button" id="tab-1"  class="tab-btn active w-full px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none" role="tab" aria-controls="content-1" aria-selected="true">REGISTRATION</button>
+                 <button type="button" id="tab-2"  class="tab-btn w-full px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none" role="tab" aria-controls="content-2" aria-selected="false">VALIDATION</button>
+                 <button type="button" id="tab-3"  class="tab-btn w-full px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none" role="tab" aria-controls="content-3" aria-selected="false">BLOOD INVENTORY</button>
+                 <button type="button" id="tab-4"  class="tab-btn w-full px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none" role="tab" aria-controls="content-4" aria-selected="false">RESERVATIONS</button>
+                 <button type="button" id="tab-5"  class="tab-btn w-full px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none" role="tab" aria-controls="content-5" aria-selected="false">ARCHIVE</button>
             </div>
         </div>
-
-        <main class="flex-1 bg-white p-6 md:p-10 rounded-xl shadow-2xl border border-gray-100 content-area overflow-y-auto">
+    </nav>
+    <main class="flex-1 bg-white p-6 md:p-10 rounded-xl shadow-2xl border border-gray-100 content-area overflow-y-auto">
             <div id="content-1" class="tab-content">
-                <!-- Content for Tab 1: Registration -->
-                <h2 class="text-2xl font-semibold text-gray-800 mb-6 border-b pb-2">Patient Registration & Unit Allotment</h2>
-                
-                <!-- NEW: Patient Search -->
                 <div class="mb-6 bg-sky-50 p-4 rounded-lg shadow-inner">
                     <label for="patientSearch_reg" class="block text-sm font-medium text-gray-700 mb-1">Find Existing Patient:</label>
-                    <input type="search" id="patientSearch_reg" placeholder="Start typing Name or CR Number..." class="block w-full md:w-1/2 rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 p-2 border">
+                    <input type="search" id="patientSearch_reg" placeholder="Start typing Name or CR Number..." class="block w-full sm:w-2/3 rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 p-2 border">
                     <div id="patientSuggestionList" class="mt-2 max-h-40 overflow-y-auto"></div>
                 </div>
 
-                <div class="md:col-span-2">
-                    <h3 class="text-xl font-medium text-sky-600 mb-4">Patient Information</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div><label for="patientName_reg" class="block text-sm font-medium text-gray-700">Full Name</label><input type="text" id="patientName_reg" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 p-2 border"></div>
-                        <div><label for="patientAge_reg" class="block text-sm font-medium text-gray-700">Age</label><input type="text" id="patientAge_reg" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 p-2 border"></div>
-                        <div><label for="patientGender_reg" class="block text-sm font-medium text-gray-700">Gender</label><select id="patientGender_reg" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 p-2 border"><option value="">Select Gender</option><option value="MALE">MALE</option><option value="FEMALE">FEMALE</option><option value="OTHER">OTHER</option></select></div>
-                        <div><label for="patientCR_reg" class="block text-sm font-medium text-gray-700">CR Number / Patient ID</label><input type="text" id="patientCR_reg" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 p-2 border"></div>
-                        <div><label for="patientBG_reg" class="block text-sm font-medium text-gray-700">Blood Group & Rh</label><select id="patientBG_reg" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 p-2 border font-bold"><option value="">Select Blood Group</option><option value="A+">A POSITIVE</option><option value="A-">A NEGATIVE</option><option value="B+">B POSITIVE</option><option value="B-">B NEGATIVE</option><option value="AB+">AB POSITIVE</option><option value="AB-">AB NEGATIVE</option><option value="O+">O POSITIVE</option><option value="O-">O NEGATIVE</option></select></div>
-                        <div><label for="patientWard_reg" class="block text-sm font-medium text-gray-700">Ward</label><input type="text" id="patientWard_reg" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 p-2 border"></div>
-                        <!-- NEW: Reservation Date Field -->
-                        <div><label for="reservationDate_reg" class="block text-sm font-medium text-gray-700">Reservation Date (Optional)</label><input type="date" id="reservationDate_reg" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 p-2 border"></div>
-                    </div>
-                </div>
-                <div class="md:col-span-2 mt-8">
-                    <h3 class="text-xl font-medium text-sky-600 mb-4">Unit Allotment Selection</h3>
-                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="md:col-span-2 space-y-4">
-                            <div><label for="crossMatchStart_reg" class="block text-sm font-medium text-gray-700">Starting Cross-Match No.</label><input type="text" id="crossMatchStart_reg" placeholder="e.g., 501" class="mt-1 block w-full md:w-48 rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 p-2 border font-bold"></div>
-                            <div><h4 class="text-lg font-medium text-gray-700 mb-2">Available Compatible Units</h4><div class="unit-table-container"><table class="unit-table" id="availableUnitsTable"><thead><tr><th>Bag Number</th><th>Group</th><th>Expiry Date</th><th>Status</th><th>Action</th></tr></thead><tbody><tr><td colspan="5" class="text-center text-gray-500 py-6">Select patient blood group.</td></tr></tbody></table></div></div>
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-8">
+
+                    <div class="md:col-span-3"> 
+                        
+                        <h3 class="text-xl font-medium text-sky-600 mb-4">Patient Information</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4"> 
+                            
+                            <div class="col-span-full md:col-span-1"> 
+                                <label for="patientName_reg" class="block text-sm font-medium text-gray-700">Full Name</label>
+                                <input type="text" id="patientName_reg" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 p-2 border">
+                            </div>
+                            
+                            <div class="col-span-full md:col-span-1">
+                                <label for="patientCR_reg" class="block text-sm font-medium text-gray-700">CR Number / Patient ID</label>
+                                <input type="text" id="patientCR_reg" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 p-2 border">
+                            </div>
+                            
+                            <div>
+                                <label for="patientAge_reg" class="block text-sm font-medium text-gray-700">Age</label>
+                                <input type="text" id="patientAge_reg" class="mt-1 block w-24 rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 p-2 border">
+                            </div>
+                            
+                            <div>
+                                <label for="patientGender_reg" class="block text-sm font-medium text-gray-700">Gender</label>
+                                <select id="patientGender_reg" class="mt-1 block w-32 rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 p-2 border">
+                                    <option value="">Select Gender</option><option value="MALE">MALE</option><option value="FEMALE">FEMALE</option><option value="OTHER">OTHER</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label for="patientBG_reg" class="block text-sm font-medium text-gray-700">Blood Group & Rh</label>
+                                <select id="patientBG_reg" class="mt-1 block w-36 rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 p-2 border font-bold">
+                                    <option value="">Select Blood Group</option><option value="A+">A POSITIVE</option><option value="A-">A NEGATIVE</option><option value="B+">B POSITIVE</option><option value="B-">B NEGATIVE</option><option value="AB+">AB POSITIVE</option><option value="AB-">AB NEGATIVE</option><option value="O+">O POSITIVE</option><option value="O-">O NEGATIVE</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label for="patientWard_reg" class="block text-sm font-medium text-gray-700">Ward</label>
+                                <input type="text" id="patientWard_reg" class="mt-1 block w-32 rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 p-2 border">
+                            </div>
+                            
+                            <div class="col-span-full md:col-span-1">
+                                <label for="reservationDate_reg" class="block text-sm font-medium text-gray-700">Reservation Date (Optional)</label>
+                                <input type="date" id="reservationDate_reg" class="mt-1 block w-40 rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 p-2 border">
+                            </div>
                         </div>
+
+                        <div class="pt-6 border-t mt-8 flex justify-center"> <button type="button" id="registerAndAllotBtn" class="w-full md:w-80 bg-sky-500 hover:bg-sky-600 text-white font-bold py-2.5 px-4 rounded-lg shadow-md transition duration-150 ease-in-out">Register & Allot Units</button> </div>
+                    </div>
+
+                    <div class="md:col-span-2"> 
                         <div class="space-y-4">
-                            <h4 class="text-lg font-medium text-gray-700 mb-2">Selected Units for Allotment</h4><div class="unit-table-container bg-green-50/50"><table class="unit-table" id="selectedUnitsTable"><thead><tr><th>Cross-Match #</th><th>Bag Number</th><th>Action</th></tr></thead><tbody><tr><td colspan="3" class="text-center text-gray-500 py-6">No units selected.</td></tr></tbody></table></div>
+                            <h3 class="text-xl font-medium text-sky-600 mb-4">Unit Allotment Selection</h3>
+                            <div>
+                                <label for="crossMatchStart_reg" class="block text-sm font-medium text-gray-700">Starting Cross-Match No.</label>
+                                <input type="text" id="crossMatchStart_reg" placeholder="e.g., 501" class="mt-1 block w-full md:w-32 rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 p-2 border font-bold">
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-medium text-gray-700 mb-2">Available Compatible Units</h4>
+                                <div class="unit-table-container">
+                                    <table class="unit-table" id="availableUnitsTable">
+                                        <thead><tr><th>Bag Number</th><th>Group</th><th>Expiry Date</th><th>Status</th><th>Action</th></tr></thead>
+                                        <tbody><tr><td colspan="5" class="text-center text-gray-500 py-6">Select patient blood group.</td></tr></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <h4 class="text-lg font-medium text-gray-700 mb-2">Selected Units for Allotment</h4>
+                                <div class="unit-table-container bg-green-50/50">
+                                    <table class="unit-table" id="selectedUnitsTable">
+                                        <thead><tr><th>Cross-Match #</th><th>Bag Number</th><th>Action</th></tr></thead>
+                                        <tbody><tr><td colspan="3" class="text-center text-gray-500 py-6">No units selected.</td></tr></tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="md:col-span-2 pt-6 border-t mt-8">
-                    <button type="button" id="registerAndAllotBtn" class="w-full md:w-80 bg-sky-500 hover:bg-sky-600 text-white font-bold py-2.5 px-4 rounded-lg shadow-md transition duration-150 ease-in-out">Register & Allot Units</button>
                 </div>
             </div>
 
             <div id="content-2" class="tab-content hidden">
-                 <!-- Content for Tab 2: Report Generation -->
-                 <h2 class="text-2xl font-semibold text-gray-800 mb-6 border-b pb-2">Crossmatch Validation  & Report Generation</h2>
                  <div id="pendingRegistrationsSection" class="mb-8">
                      <div class="mb-4">
                          <label for="registrationSearch" class="block text-sm font-medium text-gray-700 mb-1">Search Pending Registrations:</label>
@@ -645,7 +689,6 @@
                  </div>
                  <hr class="my-8 border-gray-300">
                  
-                 <!-- Technician Selector -->
                  <div class="my-6 p-4 bg-sky-50 rounded-lg border border-sky-200 flex items-center justify-between">
                     <label for="technicianSelect" class="text-sm font-semibold text-sky-800">Cross Match Done By:</label>
                     <select id="technicianSelect" class="w-3/5 p-2 border border-sky-300 rounded-md shadow-sm font-semibold text-sky-800 text-sm focus:border-sky-500 focus:ring-sky-500">
@@ -768,32 +811,26 @@
             </div>
 
             <div id="content-3" class="tab-content hidden">
-                 <!-- Content for Tab 3: Stock Inventory -->
-                 <h2 class="text-2xl font-semibold text-gray-800 mb-6 border-b pb-2">Stock Inventory</h2>
                  <div class="stock-container">
-                    <span id="printDateStock"></span>
                     <div class="summary-container">
                         <div class="summary-item">Total: <span id="totalBagsCount">0</span></div><div class="summary-item">A+: <span id="countA_pos">0</span></div><div class="summary-item">B+: <span id="countB_pos">0</span></div><div class="summary-item">O+: <span id="countO_pos">0</span></div><div class="summary-item">AB+: <span id="countAB_pos">0</span></div><div class="summary-item">A-: <span id="countA_neg">0</span></div><div class="summary-item">B-: <span id="countB_neg">0</span></div><div class="summary-item">O-: <span id="countO_neg">0</span></div><div class="summary-item">AB-: <span id="countAB_neg">0</span></div>
                      </div>
                     <div id="adminView">
-                         <h3 class="text-xl font-medium text-gray-700 mb-4 text-center">Add New Blood Bag</h3>
-                         <form id="addBagForm"><div><label for="bagPrefix_stock">Source</label><select id="bagPrefix_stock" required><option value="C-">C-</option><option value="I-">I-</option></select></div><div><label for="bagNumber">Bag No.</label><input type="text" id="bagNumber" required class="text-right"></div><div><label for="bloodGroup_stock">Blood Group</label><select id="bloodGroup_stock" required><option value="A+">A+</option><option value="A-">A-</option><option value="B+">B+</option><option value="B-">B-</option><option value="AB+">AB+</option><option value="AB-">AB-</option><option value="O+">O+</option><option value="O-">O-</option></select></div><div><label for="collectionDate_stock">Collection Date</label><input type="date" id="collectionDate_stock" required></div><div><label for="volume_stock">Volume (mL)</label><input type="number" id="volume_stock" min="100" max="500" value="350" required></div><div><label for="remarks_stock">Remarks</label><input type="text" id="remarks_stock" placeholder="Optional notes"></div><button type="submit">Add Bag</button></form>
-                         <button type="button" id="printButton" onclick="printStock()">Print</button>
+                         <form id="addBagForm" class="hidden"><div><label for="bagPrefix_stock">Source</label><select id="bagPrefix_stock" required><option value="C-">C-</option><option value="I-">I-</option></select></div><div><label for="bagNumber">Bag No.</label><input type="text" id="bagNumber" required class="text-right"></div><div><label for="bloodGroup_stock">Blood Group</label><select id="bloodGroup_stock" required><option value="A+">A+</option><option value="A-">A-</option><option value="B+">B+</option><option value="B-">B-</option><option value="AB+">AB+</option><option value="AB-">AB-</option><option value="O+">O+</option><option value="O-">O-</option></select></div><div><label for="collectionDate_stock">Collection Date</label><input type="date" id="collectionDate_stock" required></div><div><label for="volume_stock">Volume (mL)</label><input type="number" id="volume_stock" min="100" max="500" value="350" required></div><div><label for="remarks_stock">Remarks</label><input type="text" id="remarks_stock" placeholder="Optional notes"></div><button type="submit">Add Bag</button></form>
                          <table id="screenMatrixTable" class="matrixTable">
-                            <!-- This will be populated by renderAdminMatrix -->
-                         </table>
+                            </table>
+                         <button type="button" id="printButton" onclick="printStock()">Print</button>
+                         <button type="button" id="printPublicButton" onclick="printPublicStock()" class="ml-4 bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg shadow-md transition">Print Public View</button>
                      </div>
                     <div id="publicView" style="display: none;"><div class="view-info">This is a public, read-only view...</div>
                         <table id="publicMatrixTable" class="matrixTable">
-                            <!-- This will be populated by renderPublicMatrix -->
-                        </table>
+                            </table>
                     </div>
                     <table id="ledgerTable" style="display:none;"></table>
                 </div>
             </div>
 
             <div id="content-4" class="tab-content hidden">
-                <h2 class="text-2xl font-semibold text-gray-800 mb-6 border-b pb-2">Reservations</h2>
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                     <div class="md:col-span-3">
                         <label for="reservation-search" class="sr-only">Search Reservations</label>
@@ -824,8 +861,7 @@
             </div>
 
             <div id="content-5" class="tab-content hidden">
-                <h2 class="text-2xl font-semibold text-gray-800 mb-6 border-b pb-2">Archive (Previous Reports)</h2>
-                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                     <div class="md:col-span-3">
                         <label for="archive-search" class="sr-only">Search Archive</label>
                         <input type="search" id="archive-search" placeholder="Search by Patient Name, CR Number, or Bag Number..." class="block w-full rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 p-3 border">
@@ -877,7 +913,8 @@
         // --- UTILITY FUNCTIONS ---
         function calculateExpiryDate(dS){try{const d=new Date(dS);if(isNaN(d.getTime()))throw new Error("Invalid Date");d.setDate(d.getDate()+42);return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}catch(e){console.error("Invalid date for expiry:",dS);return""}}
         function ddmmyy(dS){if(!dS)return'';try{let[y,m,d]=dS.split('-');if(y&&m&&d&&y.length==4)return`${d}-${m}-${y.slice(-2)}`}catch(e){}return dS;}
-        function formatDate(dt,sh=false){try{const sD=(dS)=>{if(!dS)return new Date();if(dS instanceof Date)return dS;if(typeof dS==='number')return new Date(dS);if(!dS.includes('T'))return new Date(dS+'T00:00:00');return new Date(dS);};const d=sD(dt);if(isNaN(d.getTime()))throw new Error("Invalid Date");const p=(n)=>n.toString().padStart(2,'0');if(sh){const dy=p(d.getDate());const mn=d.toLocaleString('default',{month:'short'}).toUpperCase();const yr=d.getFullYear().toString().slice(-2);return`${dy}-${mn}-${yr}`;}const dy=p(d.getDate());const mn=p(d.getMonth()+1);const yr=d.getFullYear();return`${dy}/${mn}/${yr}`}catch(e){console.error("Invalid date for format:",dt);return"Invalid Date";}}
+        function formatDate(dt,sh=false){try{const sD=(dS)=>{if(!dS)return new Date();if(dS instanceof Date)return dS;if(typeof dS==='number')return new Date(dS);if(!dS.includes('T'))return new Date(dS+'T00:00:00');return new Date(dS);};const d=sD(dt);if(isNaN(d.getTime()))throw new Error("Invalid Date");const p=(n)=>n.toString().padStart(2,'0');if(sh){const dy=p(d.getDate());const mn=d.toLocaleString('default',{month:'short'}).toUpperCase();const yr=d.getFullYear().toString().slice(-2);return`${dy}-${mn}-${yr}`;}const dy=p(d.getDate());const mn=p(d.getMonth()+1);const yr=d.getFullYear();return`${dy}/${mn}/${yr}`}catch(e){console.error("Invalid date for format:",dt);return"Invalid Date";}
+        }
         function formatBloodGroupForReport(bg){
             if(!bg || bg==='Not Provided') return 'Not Provided';
             let g, rh;
@@ -1796,7 +1833,7 @@ function displayPendingRegistrations() {
             if (nmax === 0) {
                  matrixBodyNeg += '<tr>';
                  neg.forEach((g, ki) => {
-                    let tdClass = (ki === 0 ? 'matrix-thick-left ' : '') + (ki === neg.length - 1 ? 'matrix-thick-right ' : '');
+                    let tdClass = (ki === 0 ? 'matrix-thick-left ' : '') + (ki === pos.length - 1 ? 'matrix-thick-right ' : '');
                     matrixBodyNeg += `<td class="${tdClass.replace('matrix-thick-right', '')}">&nbsp;</td><td class="${tdClass.replace('matrix-thick-right', '')}">&nbsp;</td><td class="${tdClass.replace('matrix-thick-right', '')}">&nbsp;</td><td class="${tdClass}">&nbsp;</td>`;
                  });
                  matrixBodyNeg += '</tr>';
@@ -1839,66 +1876,21 @@ function displayPendingRegistrations() {
 
             // --- Get styles from index.html print block ---
             const printStyles = `
-                @page { size:A4 landscape; margin:8mm;}
-                body{ 
-                    font-family: Arial, sans-serif; 
-                    margin:0; 
-                    font-size:10pt;
-                    text-align:left; 
-                    background: white;
-                    -webkit-print-color-adjust: exact !important;
-                    color-adjust: exact !important;
-                }
-                .print-container { width: 100%; height: 100%; }
-                .print-header { 
-                    text-align: center; 
-                    margin-bottom: 10px; 
-                }
-                .print-header h2 { 
-                    font-size: 16pt; 
-                    margin: 0; 
-                    color: #2c5282;
-                }
-                .print-header p { 
-                    font-size: 12pt; 
-                    margin: 4px 0 0 0; 
-                    font-weight: bold;
-                }
-                .summary-container{ 
-                    display: flex !important; 
-                    margin: 10px auto 14px auto; 
-                    border: 1px solid #999; 
-                    background:#ebf8ff !important; 
-                    padding: 8px;
-                    flex-wrap: wrap;
-                    justify-content: center;
-                    gap: 6px;
-                }
-                .summary-item{
-                    font-size: 0.9em;
-                    text-align: center;
-                    font-weight: bold;
-                    padding: 3px 6px;
-                    min-width: 50px;
-                    background-color: #fff !important;
-                    border-radius: 4px;
-                    border: 1px solid #bee3f8;
-                }
-                .matrixTable { width:100%; margin:0; table-layout:fixed; border-collapse:collapse; font-size:0.97em; }
-                .matrixTable th, .matrixTable td{ border:1px solid #333 !important; padding:2px 5px; text-align:center; }
-                .matrix-thick-right { border-right: 3.8px double #700 !important;}
-                .matrix-thick-left { border-left: 3.8px double #700 !important;}
-                .group-header { background:#2c5282 !important; color:#fff !important; letter-spacing:2px; border-bottom:2px solid #1a365d !important; font-size:1em; }
-                .sub-header { background:#bee3f8 !important; font-weight:bold; }
-                .print-footer {
-                    margin-top: 10px;
-                    text-align: center;
-                    font-size: 8pt;
-                    color: #666;
-                    border-top: 1px solid #ccc;
-                    padding-top: 5px;
-                }
-            `;
+                @page { size:A4 landscape; margin:15mm;}
+    body{ font-family: Arial, sans-serif; margin:0; font-size:10pt; /* REDUCED: 11pt -> 10pt */
+          text-align:center; background: white; -webkit-print-color-adjust: exact !important; color-adjust: exact !important; }
+    .print-header { text-align: center; margin-bottom: 15px; /* Reduced margin */ }
+    .print-header h2 { font-size: 14pt; /* REDUCED: 18pt -> 14pt */ margin: 0; color: #2c5282; }
+    .print-header p { font-size: 10pt; /* REDUCED: 11pt -> 10pt */ margin: 4px 0 0 0; font-weight: normal; }
+    .summary-container{ display: flex !important; margin: 10px auto 14px auto; border: 1px solid #999; background:#ebf8ff !important; padding: 6px; /* Reduced padding */ flex-wrap: wrap; justify-content: center; gap: 4px; /* Reduced gap */ max-width: 85%; /* Reduced max-width for centering */ } 
+    .summary-item{ font-size: 0.85em; /* Reduced font size */ text-align: center; font-weight: bold; padding: 3px 6px; min-width: 45px; background-color: #fff !important; border-radius: 4px; border: 1px solid #bee3f8; }
+    .matrixTable { width:100%; margin:0; table-layout:fixed; border-collapse:collapse; font-size:0.95em; /* REDUCED: 1.0em -> 0.95em */ }
+    .matrixTable th, .matrixTable td{ border:1px solid #333 !important; padding:4px 6px; /* Reduced padding */ text-align:center; }
+    .matrix-thick-right { border-right: 3.8px double #700 !important;}
+    .matrix-thick-left { border-left: 3.8px double #700 !important;}
+    .group-header { background:#2c5282 !important; color:#fff !important; letter-spacing:1px; /* Reduced spacing */ border-bottom:2px solid #1a365d !important; font-size:1.05em; /* Slightly smaller */ }
+    .print-footer { margin-top: 15px; /* Reduced margin */ text-align: center; font-size: 7.5pt; /* Reduced font size */ color: #666; border-top: 1px solid #ccc; padding-top: 5px; }
+`;
 
             const printHtml = `
                 <!DOCTYPE html>
@@ -1917,7 +1909,7 @@ function displayPendingRegistrations() {
                         <div class="summary-container">
                             <div class="summary-item">Total: <span>${bloodStock.length}</span></div>
                             <div class="summary-item">A POS: <span>${bloodStock.filter(b => b.group === 'A+').length}</span></div>
-                            <div class="summary-item">B POS: <span>${bloodStock.filter(b => b.group === 'B+').length}</span></div>
+                            <div class="summary-item">B POS: <span>${bloodStock.filter(b => b.group === 'B+').length}</span></span></div>
                             <div class="summary-item">O POS: <span>${bloodStock.filter(b => b.group === 'O+').length}</span></div>
                             <div class="summary-item">AB POS: <span>${bloodStock.filter(b => b.group === 'AB+').length}</span></div>
                             <div class="summary-item">A NEG: <span>${bloodStock.filter(b => b.group === 'A-').length}</span></div>
@@ -1935,6 +1927,149 @@ function displayPendingRegistrations() {
             
             openPrintWindow(printHtml);
         }
+
+        // --- NEW printPublicStock function ---
+        function printPublicStock() {
+            if (bloodStock.length === 0) {
+                showCustomMessage("Stock is empty. Nothing to print.");
+                return;
+            }
+            
+            const stockDate = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+            
+            // --- Build simple table HTML for public view ---
+            const pos = ["A+","B+","O+","AB+"], neg = ["A-","B-","O-","AB-"];
+            let byPos={},byNeg={};pos.forEach(g=>byPos[g]=[]);neg.forEach(g=>byNeg[g]=[]);
+            // MODIFIED: Use ALL bloodStock for printout
+            bloodStock.forEach(b=>{ 
+                if(byPos[b.group])byPos[b.group].push(b); 
+                if(byNeg[b.group])byNeg[b.group].push(b); 
+            });
+            
+            for(let g of pos)byPos[g].sort((a,b)=>new Date(a.collectionDate)-new Date(b.collectionDate));
+            for(let g of neg)byNeg[g].sort((a,b)=>new Date(a.collectionDate)-new Date(b.collectionDate));
+            const pmax=Math.max(...pos.map(g=>byPos[g].length)), nmax=Math.max(...neg.map(g=>byNeg[g].length));
+
+            let matrixBodyPos = '';
+            for(let i=0;i<pmax;++i){
+                matrixBodyPos += '<tr>';
+                pos.forEach((g, ki) => {
+                    const b = byPos[g][i];
+                    let tdClass = (ki === 0 ? 'matrix-thick-left ' : '') + (ki === pos.length - 1 ? 'matrix-thick-right ' : '');
+                    matrixBodyPos += `<td class="${tdClass}">${b ? b.bagNumber : '&nbsp;'}</td>`;
+                });
+                matrixBodyPos += '</tr>';
+            }
+            if (pmax === 0) {
+                matrixBodyPos += '<tr>';
+                pos.forEach((g, ki) => {
+                    let tdClass = (ki === 0 ? 'matrix-thick-left ' : '') + (ki === pos.length - 1 ? 'matrix-thick-right ' : '');
+                    matrixBodyPos += `<td class="${tdClass}">&nbsp;</td>`;
+                });
+                matrixBodyPos += '</tr>';
+            }
+
+            let matrixBodyNeg = '';
+            for(let i=0;i<nmax;++i){
+                matrixBodyNeg += '<tr>';
+                neg.forEach((g, ki) => {
+                    const b = byNeg[g][i];
+                    let tdClass = (ki === 0 ? 'matrix-thick-left ' : '') + (ki === neg.length - 1 ? 'matrix-thick-right ' : '');
+                    matrixBodyNeg += `<td class="${tdClass}">${b ? b.bagNumber : '&nbsp;'}</td>`;
+                });
+                matrixBodyNeg += '</tr>';
+            }
+            if (nmax === 0) {
+                matrixBodyNeg += '<tr>';
+                neg.forEach((g, ki) => {
+                    let tdClass = (ki === 0 ? 'matrix-thick-left ' : '') + (ki === pos.length - 1 ? 'matrix-thick-right ' : '');
+                    matrixBodyNeg += `<td class="${tdClass}">&nbsp;</td>`;
+                });
+                matrixBodyNeg += '</tr>';
+            }
+            
+            // MODIFIED: Removed max-width/margin styles to allow it to spread across the landscape page
+            const gridHtml = `
+                <table class="matrixTable" style="max-width: 900px; margin: 0 auto; font-size: 0.85em;">
+                    <thead>
+                        <tr>
+                            <th class="group-header matrix-thick-left">A POS</th>
+                            <th class="group-header matrix-thick-left">B POS</th>
+                            <th class="group-header matrix-thick-left">O POS</th>
+                            <th class="group-header matrix-thick-left matrix-thick-right">AB POS</th>
+                        </tr>
+                    </thead>
+                    <tbody>${matrixBodyPos}</tbody>
+                    <thead>
+                        <tr>
+                            <th class="group-header matrix-thick-left">A NEG</th>
+                            <th class="group-header matrix-thick-left">B NEG</th>
+                            <th class="group-header matrix-thick-left">O NEG</th>
+                            <th class="group-header matrix-thick-left matrix-thick-right">AB NEG</th>
+                        </tr>
+                    </thead>
+                    <tbody>${matrixBodyNeg}</tbody>
+                </table>
+            `;
+
+            
+            const printStyles = `
+                @page { size:A4 landscape; margin:15mm;}
+                body{ font-family: Arial, sans-serif; margin:0; font-size:11pt; text-align:center; background: white; -webkit-print-color-adjust: exact !important; color-adjust: exact !important; }
+                .print-header { text-align: center; margin-bottom: 20px; }
+                .print-header h2 { font-size: 18pt; margin: 0; color: #2c5282; }
+                .print-header p { font-size: 11pt; margin: 4px 0 0 0; font-weight: normal; }
+                /* MODIFIED: Increased max-width for better use of landscape space */
+                .summary-container{ display: flex !important; margin: 10px auto 14px auto; border: 1px solid #999; background:#ebf8ff !important; padding: 8px; flex-wrap: wrap; justify-content: center; gap: 6px; max-width: 90%;} 
+                .summary-item{ font-size: 0.9em; text-align: center; font-weight: bold; padding: 3px 6px; min-width: 50px; background-color: #fff !important; border-radius: 4px; border: 1px solid #bee3f8; }
+                .matrixTable { width:100%; margin:0; table-layout:fixed; border-collapse:collapse; font-size:1.0em; }
+                .matrixTable th, .matrixTable td{ border:1px solid #333 !important; padding:5px 8px; text-align:center; }
+                .matrix-thick-right { border-right: 3.8px double #700 !important;}
+                .matrix-thick-left { border-left: 3.8px double #700 !important;}
+                .group-header { background:#2c5282 !important; color:#fff !important; letter-spacing:2px; border-bottom:2px solid #1a365d !important; font-size:1.1em; }
+                .print-footer { margin-top: 20px; text-align: center; font-size: 8pt; color: #666; border-top: 1px solid #ccc; padding-top: 5px; }
+            `;
+
+            // Note: The printout title and summary text have been reverted to include ALL bags
+            // to match the request, as the public view should typically display all stock.
+            const totalStock = bloodStock; 
+            
+            const printHtml = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Blood Stock Public Report</title>
+                    <style>${printStyles}</style>
+                </head>
+                <body>
+                    <div class="print-container">
+                        <div class="print-header">
+                            <h2>Blood Stock Summary</h2>
+                            <p>Dr. BAM Hospital Blood Storage Centre - As on: ${stockDate}</p>
+                        </div>
+                        <div class="summary-container">
+                            <div class="summary-item">Total: <span>${totalStock.length}</span></div>
+                            <div class="summary-item">A POS: <span>${totalStock.filter(b => b.group === 'A+').length}</span></div>
+                            <div class="summary-item">B POS: <span>${totalStock.filter(b => b.group === 'B+').length}</span></div>
+                            <div class="summary-item">O POS: <span>${totalStock.filter(b => b.group === 'O+').length}</span></div>
+                            <div class="summary-item">AB POS: <span>${totalStock.filter(b => b.group === 'AB+').length}</span></div>
+                            <div class="summary-item">A NEG: <span>${totalStock.filter(b => b.group === 'A-').length}</span></div>
+                            <div class="summary-item">B NEG: <span>${totalStock.filter(b => b.group === 'B-').length}</span></div>
+                            <div class="summary-item">O NEG: <span>${totalStock.filter(b => b.group === 'O-').length}</span></div>
+                            <div class="summary-item">AB NEG: <span>${totalStock.filter(b => b.group === 'AB-').length}</span></div>
+                        </div>
+                        ${gridHtml}
+                        <div class="print-footer">
+                            Generated on: ${new Date().toLocaleString()} | All stock is displayed, including reserved or quarantined units.
+                        </div>
+                    </div>
+                </body>
+                </html>`;
+            
+            openPrintWindow(printHtml);
+        }
+        // --- End of NEW printPublicStock function ---
 
         // --- TAB 4: ARCHIVE FUNCTIONALITY ---
         /**
@@ -2347,6 +2482,7 @@ function displayPendingRegistrations() {
             `;
             const pos = ["A+","B+","O+","AB+"], neg = ["A-","B-","O-","AB-"];
             let byPos={},byNeg={};pos.forEach(g=>byPos[g]=[]);neg.forEach(g=>byNeg[g]=[]);
+            // MODIFIED: Use ALL bags, not just those 'isCrossmatchReady'
             stock.forEach(b=>{ if(byPos[b.group])byPos[b.group].push(b); if(byNeg[b.group])byNeg[b.group].push(b); });
             for(let g of pos)byPos[g].sort((a,b)=>new Date(a.collectionDate)-new Date(b.collectionDate));
             for(let g of neg)byNeg[g].sort((a,b)=>new Date(a.collectionDate)-new Date(b.collectionDate));
@@ -2433,17 +2569,40 @@ function displayReservations() {
         return name.includes(searchTerm) || cr.includes(searchTerm) || bags.includes(searchTerm);
     });
 
+    // If there is an expired/cancelled reservation, it will still show up here unless 
+    // the cleanup routine runs. We only want to sort those to the bottom.
+    
+    // Split into active/expired/cancelled for sorting
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    let activeReservations = [];
+    let expiredOrCancelledReservations = [];
+
+    filtered.forEach(rec => {
+        let reservationDate = new Date(rec.reservationDate + 'T00:00:00');
+        let isExpiredForDisplay = reservationDate < today;
+
+        if (rec.status === 'cancelled_reservation' || rec.status === 'cancelled' || isExpiredForDisplay) {
+            expiredOrCancelledReservations.push(rec);
+        } else {
+            activeReservations.push(rec);
+        }
+    });
+
+    // Sort active by reservationDate ascending (nearest first)
+    activeReservations.sort((a,b) => new Date(a.reservationDate) - new Date(b.reservationDate));
+    // Sort expired/cancelled by reservationDate descending (most recently expired first)
+    expiredOrCancelledReservations.sort((a,b) => new Date(b.reservationDate) - new Date(a.reservationDate));
+
+    filtered = [...activeReservations, ...expiredOrCancelledReservations];
+    
+    // --- END NEW SORTING LOGIC ---
+
     if (filtered.length === 0) {
         tableBody.innerHTML = `<tr><td colspan="7" class="text-center text-gray-500 py-6">No reservations found${searchTerm ? ' matching search' : ''}.</td></tr>`;
         return;
     }
-
-    // sort by reservationDate ascending (nearest first)
-    filtered.sort((a,b) => new Date(a.reservationDate) - new Date(b.reservationDate));
-
-    // --- NEW: Calculate 'expired' status for display ---
-    const now = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
     filtered.forEach(rec => {
         const tr = tableBody.insertRow();
@@ -2717,7 +2876,7 @@ function displayReservations() {
 
         // --- GLOBAL EXPOSURE ---
         
-        window.switchTab=switchTab; window.deleteBag=deleteBag; window.printStock=printStock; window.selectUnitForCurrentPatient=selectUnitForCurrentPatient; window.removeUnitForCurrentPatient=removeUnitForCurrentPatient; window.prepareReportForPatient=prepareReportForPatient; window.cancelRegistration=cancelRegistration; window.updateRegistrationStatus=updateRegistrationStatus; window.searchArchive=searchArchive; window.printArchivedReport=printArchivedReport; window.deleteArchivedRecord=deleteArchivedRecord; window.displayReservations = displayReservations; window.makeBagReady=makeBagReady; window.loadRegistrationForEdit=loadRegistrationForEdit;
+        window.switchTab=switchTab; window.deleteBag=deleteBag; window.printStock=printStock; window.printPublicStock=printPublicStock; window.selectUnitForCurrentPatient=selectUnitForCurrentPatient; window.removeUnitForCurrentPatient=removeUnitForCurrentPatient; window.prepareReportForPatient=prepareReportForPatient; window.cancelRegistration=cancelRegistration; window.updateRegistrationStatus=updateRegistrationStatus; window.searchArchive=searchArchive; window.printArchivedReport=printArchivedReport; window.deleteArchivedRecord=deleteArchivedRecord; window.displayReservations = displayReservations; window.makeBagReady=makeBagReady; window.loadRegistrationForEdit=loadRegistrationForEdit;
         // --- INITIALIZATION ---
         document.addEventListener('DOMContentLoaded', () => {
              if (!firebaseConfig) { 
@@ -2732,7 +2891,7 @@ function displayReservations() {
             d('tab-4').addEventListener('click', () => switchTab(4));
             d('tab-5').addEventListener('click', () => switchTab(5));
             // --- END OF NEW BLOCK --
-            const isPublic=window.location.hash==='#public'; const adminV=d('adminView'),publicV=d('publicView'); if(adminV&&publicV){if(isPublic){adminV.style.display='none';publicV.style.display='block';}else{adminV.style.display='block';publicV.style.display='none';}} const printDEl=d('printDateStock'); if(printDEl){const t=new Date();printDEl.textContent=`Stock Date: ${t.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})}`;} const addF=d('addBagForm'); if(addF){const dI=d('collectionDate_stock');if(dI)dI.value=new Date().toISOString().slice(0,10);addF.onsubmit=function(e){e.preventDefault();const p=d('bagPrefix_stock').value,n=d('bagNumber').value.trim(),f=p+n,g=d('bloodGroup_stock').value,cd=d('collectionDate_stock').value,v=parseInt(d('volume_stock').value,10),r=d('remarks_stock').value.trim();if(n==="") {showCustomMessage("Enter Bag No.");return;}addBag(f,g,cd,v,r);d('bagNumber').value='';d('remarks_stock').value='';d('bagNumber').focus();};}
+            const isPublic=window.location.hash==='#public'; const adminV=d('adminView'),publicV=d('publicView'); if(adminV&&publicV){if(isPublic){adminV.style.display='none';publicV.style.display='none';}else{adminV.style.display='block';publicV.style.display='none';}} const printDEl=d('printDateStock'); if(printDEl){const t=new Date();printDEl.textContent=`Stock Date: ${t.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})}`;} const addF=d('addBagForm'); if(addF){const dI=d('collectionDate_stock');if(dI)dI.value=new Date().toISOString().slice(0,10);addF.onsubmit=function(e){e.preventDefault();const p=d('bagPrefix_stock').value,n=d('bagNumber').value.trim(),f=p+n,g=d('bloodGroup_stock').value,cd=d('collectionDate_stock').value,v=parseInt(d('volume_stock').value,10),r=d('remarks_stock').value.trim();if(n==="") {showCustomMessage("Enter Bag No.");return;}addBag(f,g,cd,v,r);d('bagNumber').value='';d('remarks_stock').value='';d('bagNumber').focus();};}
             // safe listeners
             const bgEl = d('patientBG_reg');
             if (bgEl) bgEl.addEventListener('change', displayCompatibleUnits);
@@ -2775,4 +2934,3 @@ function displayReservations() {
     </script>
 </body>
 </html>
-
