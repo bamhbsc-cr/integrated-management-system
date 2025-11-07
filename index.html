@@ -1763,6 +1763,7 @@ function displayPendingRegistrations() {
          }
 
         // --- NEW printStock function (based on index.html layout) ---
+        // --- NEW printStock function (to match index-stock.html layout and fit on A4 landscape) ---
         function printStock() {
             if (bloodStock.length === 0) {
                 showCustomMessage("Stock is empty. Nothing to print.");
@@ -1771,7 +1772,7 @@ function displayPendingRegistrations() {
             
             const stockDate = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
             
-            // --- Build table HTML based on index.html logic ---
+            // --- Build table HTML based on index-stock.html logic ---
             const pos = ["A+","B+","O+","AB+"], neg = ["A-","B-","O-","AB-"];
             let byPos={},byNeg={};pos.forEach(g=>byPos[g]=[]);neg.forEach(g=>byNeg[g]=[]);
             bloodStock.forEach(b=>{ if(byPos[b.group])byPos[b.group].push(b); if(byNeg[b.group])byNeg[b.group].push(b); });
@@ -1833,7 +1834,7 @@ function displayPendingRegistrations() {
             if (nmax === 0) {
                  matrixBodyNeg += '<tr>';
                  neg.forEach((g, ki) => {
-                    let tdClass = (ki === 0 ? 'matrix-thick-left ' : '') + (ki === pos.length - 1 ? 'matrix-thick-right ' : '');
+                    let tdClass = (ki === 0 ? 'matrix-thick-left ' : '') + (ki === neg.length - 1 ? 'matrix-thick-right ' : '');
                     matrixBodyNeg += `<td class="${tdClass.replace('matrix-thick-right', '')}">&nbsp;</td><td class="${tdClass.replace('matrix-thick-right', '')}">&nbsp;</td><td class="${tdClass.replace('matrix-thick-right', '')}">&nbsp;</td><td class="${tdClass}">&nbsp;</td>`;
                  });
                  matrixBodyNeg += '</tr>';
@@ -1874,23 +1875,68 @@ function displayPendingRegistrations() {
                 </table>
             `;
 
-            // --- Get styles from index.html print block ---
+            // --- Apply consolidated and reduced print styles from index-stock.html ---
             const printStyles = `
-                @page { size:A4 landscape; margin:15mm;}
-    body{ font-family: Arial, sans-serif; margin:0; font-size:10pt; /* REDUCED: 11pt -> 10pt */
-          text-align:center; background: white; -webkit-print-color-adjust: exact !important; color-adjust: exact !important; }
-    .print-header { text-align: center; margin-bottom: 15px; /* Reduced margin */ }
-    .print-header h2 { font-size: 14pt; /* REDUCED: 18pt -> 14pt */ margin: 0; color: #2c5282; }
-    .print-header p { font-size: 10pt; /* REDUCED: 11pt -> 10pt */ margin: 4px 0 0 0; font-weight: normal; }
-    .summary-container{ display: flex !important; margin: 10px auto 14px auto; border: 1px solid #999; background:#ebf8ff !important; padding: 6px; /* Reduced padding */ flex-wrap: wrap; justify-content: center; gap: 4px; /* Reduced gap */ max-width: 85%; /* Reduced max-width for centering */ } 
-    .summary-item{ font-size: 0.85em; /* Reduced font size */ text-align: center; font-weight: bold; padding: 3px 6px; min-width: 45px; background-color: #fff !important; border-radius: 4px; border: 1px solid #bee3f8; }
-    .matrixTable { width:100%; margin:0; table-layout:fixed; border-collapse:collapse; font-size:0.95em; /* REDUCED: 1.0em -> 0.95em */ }
-    .matrixTable th, .matrixTable td{ border:1px solid #333 !important; padding:4px 6px; /* Reduced padding */ text-align:center; }
-    .matrix-thick-right { border-right: 3.8px double #700 !important;}
-    .matrix-thick-left { border-left: 3.8px double #700 !important;}
-    .group-header { background:#2c5282 !important; color:#fff !important; letter-spacing:1px; /* Reduced spacing */ border-bottom:2px solid #1a365d !important; font-size:1.05em; /* Slightly smaller */ }
-    .print-footer { margin-top: 15px; /* Reduced margin */ text-align: center; font-size: 7.5pt; /* Reduced font size */ color: #666; border-top: 1px solid #ccc; padding-top: 5px; }
-`;
+                @page { size:A4 landscape; margin:8mm;}
+                body{ 
+                    font-family: Arial, sans-serif; 
+                    margin:0; 
+                    font-size:10pt;
+                    text-align:left; 
+                    background: white;
+                    -webkit-print-color-adjust: exact !important;
+                    color-adjust: exact !important;
+                }
+                .print-container { width: 100%; height: 100%; }
+                .print-header { 
+                    text-align: center; 
+                    margin-bottom: 10px; 
+                }
+                .print-header h2 { 
+                    font-size: 16pt; 
+                    margin: 0; 
+                    color: #2c5282;
+                }
+                .print-header p { 
+                    font-size: 12pt; 
+                    margin: 4px 0 0 0; 
+                    font-weight: bold;
+                }
+                .summary-container{ 
+                    display: flex !important; 
+                    margin: 10px auto 14px auto; 
+                    border: 1px solid #999; 
+                    background:#ebf8ff !important; 
+                    padding: 8px;
+                    flex-wrap: wrap;
+                    justify-content: center;
+                    gap: 6px;
+                }
+                .summary-item{
+                    font-size: 0.9em;
+                    text-align: center;
+                    font-weight: bold;
+                    padding: 3px 6px;
+                    min-width: 50px;
+                    background-color: #fff !important;
+                    border-radius: 4px;
+                    border: 1px solid #bee3f8;
+                }
+                .matrixTable { width:100%; margin:0; table-layout:fixed; border-collapse:collapse; font-size:0.97em; }
+                .matrixTable th, .matrixTable td{ border:1px solid #333 !important; padding:2px 5px; text-align:center; }
+                .matrix-thick-right { border-right: 3.8px double #700 !important;}
+                .matrix-thick-left { border-left: 3.8px double #700 !important;}
+                .group-header { background:#2c5282 !important; color:#fff !important; letter-spacing:2px; border-bottom:2px solid #1a365d !important; font-size:1em; }
+                .sub-header { background:#bee3f8 !important; font-weight:bold; }
+                .print-footer {
+                    margin-top: 10px;
+                    text-align: center;
+                    font-size: 8pt;
+                    color: #666;
+                    border-top: 1px solid #ccc;
+                    padding-top: 5px;
+                }
+            `;
 
             const printHtml = `
                 <!DOCTYPE html>
@@ -1904,7 +1950,7 @@ function displayPendingRegistrations() {
                     <div class="print-container">
                         <div class="print-header">
                             <h2>Blood Stock Report</h2>
-                            <p>Dr. BAM Hospital Blood Storage Centre - As on: ${stockDate} At: 10:00 AM</p>
+                            <p>Dr. BAM Hospital Blood Storage Centre - As on: ${stockDate} At: ${new Date().toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit'})}</p>
                         </div>
                         <div class="summary-container">
                             <div class="summary-item">Total: <span>${bloodStock.length}</span></div>
@@ -1927,7 +1973,6 @@ function displayPendingRegistrations() {
             
             openPrintWindow(printHtml);
         }
-
         // --- NEW printPublicStock function ---
         function printPublicStock() {
             if (bloodStock.length === 0) {
@@ -2933,4 +2978,5 @@ function displayReservations() {
         });
     </script>
 </body>
+
 </html>
